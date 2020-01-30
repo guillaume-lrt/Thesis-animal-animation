@@ -1,0 +1,25 @@
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1002,5): warning MSB8027: Two or more files with the name of utils.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are code_p3a\Data_Structure\utils.cpp, code_p3a\utils.cpp.
+  main.cpp
+  The contents of <filesystem> are only available with C++17 or later.
+C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(48,34): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(49,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(50,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(51,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          with
+          [
+              _Ty=float
+          ]
+C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Sprite.hpp(43,1): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+  cpp.vcxproj -> C:\Users\ptitg\Documents\@Thesis\p3A_previous_work\cpp\x64\Debug\cpp.exe
