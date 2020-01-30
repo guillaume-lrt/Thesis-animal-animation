@@ -161,10 +161,12 @@ double new_conf(Mat& target, Vec3f& v, Mat& rep, Skeleton3D& s, double angle_max
 }
 
 void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
+    // target = mask/1.png
+
     double T = 20;
     double decr = 0.999;
     double limit = 0.0001;
-    double angle_max = 8;
+    double angle_max = 0;       // = 8;
     double k_b = 2*1e-4;
     
     v = v/norm(v);
@@ -175,8 +177,6 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
     
     if(fichier)  // si l'ouverture a réussi
     {
-        // instructions
-        
         double r, r_max=0;
         int j = 0;
         while (T>limit && key!='q'){
@@ -280,7 +280,7 @@ int main(int argc, const char * argv[]) {
     
     resize(im, im, Size(), 1.6, 1.6);
     //imshow("hello", im);waitKey(0);
-    cout<<"Image shape = "<<im.size<<endl;
+    cout<<"Image: " << query.str() << ", with shape = "<<im.size<<endl;
     
     //Test 3D skeleton
     Skeleton3D hip = test3D();
