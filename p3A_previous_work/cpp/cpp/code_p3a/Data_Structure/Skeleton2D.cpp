@@ -67,8 +67,6 @@ void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im){
         oneMat(width, height, dest, debug_im, i);
         children[i].auxMat(width, height, dest, debug_im);
     }
-    
-    
 };
 
 void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i){
@@ -94,21 +92,21 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i){
     }
     if (children[i].name=="neck"){
         Size s(d/2, 3./5*d/2);
+        //Size s(10, 10);
         Point pt1 = p2;
-        Point pt2 = p_dest + Point(0, 5./6*d);
-        rectangle(dest, pt1, pt2, Scalar(255, 0, 0), cv::FILLED);
+        Point pt2 = p_dest + Point(0, 5. / 6 * d); // + Point(100,100);
+        //cout << "point: " << d << pt1 << pt2 << endl;
+        rectangle(dest, pt1, pt2, Scalar(255, 255, 255), cv::FILLED);
         //ellipse(dest, center, s, theta*180/PI, 0, 360, Scalar(255, 0, 0), -1);
     }
     else {
-        Size s(d/2, pow(d, 3./2)/50);
+        //Size s(d/2, pow(d, 3./2)/50);
+        Size s(d / 2, 10);
         ellipse(dest, center, s, theta*180/PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
     }
-    ellipse(debug_im, center, pt, 0, 0, 360, Scalar(0, 0, 0), -1);
+    //ellipse(debug_im, center, pt, 0, 0, 360, Scalar(0, 0, 0), -1);
     arrowedLine(debug_im, p2, p_dest, Scalar(0, 0, 0));
     putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));
-    
-    
-    
 };
 
 

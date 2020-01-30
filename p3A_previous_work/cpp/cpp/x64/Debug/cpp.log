@@ -1,25 +1,101 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(1002,5): warning MSB8027: Two or more files with the name of utils.cpp will produce outputs to the same location. This can lead to an incorrect build result.  The files involved are code_p3a\Data_Structure\utils.cpp, code_p3a\utils.cpp.
-  main.cpp
-  The contents of <filesystem> are only available with C++17 or later.
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(48,34): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+  Skeleton2D.cpp
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(43,17): warning C4244: 'initialisation' : conversion de '_Ty' en 'float', perte possible de données
           with
           [
-              _Ty=float
+              _Ty=double
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(49,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(47,29): warning C4244: '=' : conversion de '_Ty' en '_Tp', perte possible de données
           with
           [
-              _Ty=float
+              _Ty=double
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(50,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          and
+          [
+              _Tp=float
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(48,29): warning C4244: '=' : conversion de '_Ty' en '_Tp', perte possible de données
           with
           [
-              _Ty=float
+              _Ty=double
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Quaternion.hpp(51,41): warning C4244: 'argument' : conversion de 'double' en '_Ty', perte possible de données
+          and
+          [
+              _Tp=float
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(64,26): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
           with
           [
-              _Ty=float
+              _Tp=float
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Sprite.hpp(43,1): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(64,17): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(67,48): warning C4267: 'argument' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(75,26): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(75,17): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(76,72): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(76,35): warning C4244: 'argument' : conversion de '_Tp' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=float
+          ]
+          and
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(94,27): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(94,17): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(97,46): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=int
+          ]
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton2D.cpp(104,18): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
+          with
+          [
+              _Tp=int
+          ]
   cpp.vcxproj -> C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\x64\Debug\cpp.exe
