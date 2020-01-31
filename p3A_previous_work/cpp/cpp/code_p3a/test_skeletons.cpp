@@ -10,9 +10,10 @@
 
 Skeleton2D test2D(){
     vector<Skeleton2D> vide;
-    Point3f ptr(8, 5, 1);
+    Point3f ptr(8*10, 5*10, 1);
     Skeleton2D trump(ptr, vide, "trump");
-    Point3f n(7.8, 2, 1);
+    Point3f n(7.8*10, 2, 1);
+    cout << "test skeleton 2D" << endl;
     Skeleton2D nose(n, vide, "nose");
     nose.add_child(trump);
     Point3f h(7.2, 1.5, 1);
@@ -57,6 +58,7 @@ Skeleton2D test2D(){
 }
 
 Skeleton3D test3D(){
+    //cout << "test skeleton 3D" << endl;
     vector<Skeleton3D> vide;
     Quaternion un(1, 0, 0, 0);
     Point3f pt_ptr(0, 2.3, 0);

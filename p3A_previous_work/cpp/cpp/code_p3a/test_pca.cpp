@@ -41,7 +41,6 @@ vector<Point> testContours(Mat& src){
             for( int j = 0; j< contours[i].size(); j++ )
                 contours_flat.push_back(contours[i][j]);
         }
-        
     }
     
     /// Show in a window

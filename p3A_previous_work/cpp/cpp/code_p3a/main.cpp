@@ -166,7 +166,7 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
     double T = 20;
     double decr = 0.999;
     double limit = 0.0001;
-    double angle_max = 8;       // = 8;
+    double angle_max = 0;       // = 8;
     double k_b = 2*1e-4;
     
     v = v/norm(v);
