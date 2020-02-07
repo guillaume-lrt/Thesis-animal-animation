@@ -95,7 +95,7 @@ Skeleton3D test3D(){
     Joint3D rf(pt_rf, un);
     Skeleton3D right(rf, vide, "rf");
     right.add_child(xright);
-    Point3f pt_ne(3.2, 0.2, 0);
+    Point3f pt_ne(3.2, 0, 0);
     Joint3D ne(pt_ne, un);
     Skeleton3D neck(ne, vide, "neck");
     neck.add_child(left); neck.add_child(right); neck.add_child(head);

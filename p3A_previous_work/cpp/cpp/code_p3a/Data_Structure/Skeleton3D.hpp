@@ -43,10 +43,14 @@ class Skeleton3D{
         String get_name(){
             return name;
         }
+        Joint3D get_root() {
+            return root;
+        }
         void rotate(Quaternion q);
         void updateAbsolutePosition(vector<Quaternion> q = vector<Quaternion>(), vector<Point3f> t =vector<Point3f>());
         Skeleton2D project(Mat& d);
         void transform(Mat& h);
+        void transform_translate(int x, int y, int z);
 
 };
 

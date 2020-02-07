@@ -7,6 +7,7 @@
 //
 
 #include "Quaternion.hpp"
+#include <iostream>
 
 double Quaternion::norm2(){
     double x = this->x[0];
@@ -41,10 +42,13 @@ void Quaternion::multiplyQuaternion(const Quaternion& q1,const Quaternion& q2, Q
 }
 void Quaternion::applyQuaternion(Quaternion& q, Point3f& p){
     // First quaternion q1 (x1 y1 z1 r1)
-    Quaternion aux(p);
-    Quaternion a1, a2;
-    Quaternion::multiplyQuaternion(q, aux, a1);
-    Quaternion::multiplyQuaternion(a1, q.inv(), a2);
-    p = Point3f(a2(1), a2(2), a2(3));
+    cout << "quaternion: " << q << " and point (absolute position): " << p << endl;
+    Quaternion aux(p);      // convert p into a quaternion
+    Quaternion a1, a2;      // initialize as (0,0,0,0)
+    Quaternion::multiplyQuaternion(q, aux, a1);         // a1 = q * aux
+    Quaternion::multiplyQuaternion(a1, q.inv(), a2);    // a2 = a1 * q^-1
+    p = Point3f(a2(1), a2(2), a2(3));   // p = q * quad(p) * q^-1
+
+    cout << "new point: " << p << endl;
     return ;
 }

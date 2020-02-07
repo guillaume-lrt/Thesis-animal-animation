@@ -10,10 +10,9 @@
 #define PI 3.14159265
 
 void Skeleton2D::transform(Mat& h){
-    //cout<<"transformation de "<<name<<" : "<<this->pos;
+    //cout<<"DEBUG h: " << h << endl;
     Point3f p = h*(this->pos);
     this->setPos(p);
-    //cout<<" devient "<<this->pos<<endl;
     for (size_t i=0; i<children.size(); i++){
         children[i].transform(h);
     }
@@ -46,7 +45,7 @@ void Skeleton2D::normalize(int width, int height){
     m.at<float>(2,2) = 1;
     m.at<float>(0,2) = scale*(-minMax[0]);
     m.at<float>(1,2) = scale*(-minMax[2]);
-    //cout<<"Matrice de normalisation : \n"<<m<<endl;
+    cout<<"m: \n"<<m<<endl;
     transform(m);
 }
 
@@ -54,8 +53,9 @@ Mat Skeleton2D::toMat(int width, int height){
     Mat m = Mat::zeros(width, height, CV_8U);
     Mat debug_im = 255*Mat::ones(width, height, CV_8U);
     auxMat(width, height, m, debug_im);
-    //imshow("skeleton", debug_im); waitKey(0);
-    return m;
+    //cout << "debug" << debug_im.size() << endl;
+    imshow("skeleton", debug_im); waitKey(10); 
+    return m;                                  
 };
 
 void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im){
@@ -90,7 +90,7 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i){
     else {
         theta = atan((float)vector.y/vector.x);
     }
-    if (children[i].name=="neck"){
+    if (children[i].name=="nneck"){     // put "neck" if you want the neck to be a rectangle
         Size s(d/2, 3./5*d/2);
         //Size s(10, 10);
         Point pt1 = p2;

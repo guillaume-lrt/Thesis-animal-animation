@@ -37,10 +37,10 @@ using namespace cv;
 Mat optimize(Mat& im, Skeleton2D& t){
     Mat c, c2, c3;
     c = t.toMat(im.rows, im.cols);
-    
+    /*
     //Min Max Scaling using bboxes
     Mat h_rect = find_rect_match(im, c);
-    t.transform(h_rect);
+    t.h_rect);
     c2 = t.toMat(im.rows, im.cols);
     
     //Getting rot and trans using pca
@@ -48,8 +48,8 @@ Mat optimize(Mat& im, Skeleton2D& t){
     Mat h = get_trans(im, c2);
     t.transform(h);
     c3 = t.toMat(im.rows, im.cols);
-    
-    return c3;
+    */
+    return c;
 }
 void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="None"){
     Mat i = 255*Mat::ones(m1.rows, m1.cols, m1.type());
@@ -65,7 +65,7 @@ void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="N
     imshow(name, out);
     return;
 }
-double try_and_optimize(Mat& target, Vec3f& v, Skeleton3D& s, double angle_min, double angle_max){
+/*double try_and_optimize(Mat& target, Vec3f& v, Skeleton3D& s, double angle_min, double angle_max){ 
     Mat c;
 
     int n = 10;
@@ -96,7 +96,7 @@ double try_and_optimize(Mat& target, Vec3f& v, Skeleton3D& s, double angle_min, 
             Skeleton2D t = s.project(rep);
             t.normalize(target.rows, target.cols);
             c = optimize(target, t);
-            //imshow("c", c); waitKey();
+            imshow("c", c); waitKey(5);
             Scalar r = iou(target, c);
             if (r[0]>r_max){
                 k_max = k;
@@ -115,20 +115,10 @@ double try_and_optimize(Mat& target, Vec3f& v, Skeleton3D& s, double angle_min, 
     show_merged("m2", target, c);
     return r_max;
 }
-
+*/
 double new_conf(Mat& target, Vec3f& v, Mat& rep, Skeleton3D& s, double angle_max){
     Mat c;
     Scalar r;
-    
-    //symetry
-    /*double alea = (double) rand()/RAND_MAX;
-    if (alea<0.01){
-        cout<<"yes"<<endl;
-        Mat h = Mat::zeros(3, 3, CV_32F);
-        h.at<float>(0, 0) = 1; h.at<float>(1, 1) = -1; h.at<float>(2, 2) = 1;
-        s.transform(h);
-    }*/
-    
     
     queue<Skeleton3D*> to_do;
     to_do.push(&s);
@@ -141,14 +131,10 @@ double new_conf(Mat& target, Vec3f& v, Mat& rep, Skeleton3D& s, double angle_max
             to_do.push(moving->get_child(j));
         }
         double angle = 2*angle_max*PI/180*(double)rand() / RAND_MAX - angle_max*PI/180;
-        //if (!first){
-        //cout << "Random angle: " << angle << moving->get_name() << endl;
-        //double angle = 0.137607;
+
         Quaternion q(angle, v);
         moving->rotate(q);
-        //}
-        //else
-        //    first = false;
+
         s.updateAbsolutePosition();
         
         Skeleton2D t = s.project(rep);
@@ -170,12 +156,13 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
     double k_b = 2*1e-4;
     
     v = v/norm(v);
-    Mat rep = repere_plane(v);
+    //Mat rep = repere_plane(v);
+    Mat rep = Mat::eye(3, 3, CV_32FC1);
     
     char key = 'a';
     ofstream fichier("energy.txt", ios::out | ios::trunc);  //déclaration du flux et ouverture du fichier
     
-    if(fichier)  // si l'ouverture a réussi
+    if(fichier)
     {
         double r, r_max=0;
         int j = 0;
@@ -208,9 +195,10 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
                 fichier<<r_max<<";"<<T<<endl;
             }
             //cout<<"ok:"<<new_confs_alea*100/(new_confs_alea+new_confs)<<"%"<<endl;
-            if (j%2==0){
+            if (j%5==0){
                 //cout<<"T="<<T<<endl;
                 
+                cout << "project" << rep << endl;
                 Skeleton2D t = s_max.project(rep);
                 t.normalize(target.rows, target.cols);
                 Mat c = optimize(target, t);
@@ -227,38 +215,26 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
 }
 
 
-void par_morceaux(Mat& target, Vec3f& v, Skeleton3D& s_max){
-
-    v = v/norm(v);
-    Mat rep = repere_plane(v);
-    
-    char key = 'a';
-    
-    
-    
-}
+//void par_morceaux(Mat& target, Vec3f& v, Skeleton3D& s_max){
+//
+//    v = v/norm(v);
+//    Mat rep = repere_plane(v);
+//    
+//    char key = 'a';
+//}
 
 int main(int argc, const char * argv[]) {
-    
-    //get cwd
-    /*size_t s;
-    char* buffer;
-    buffer = getcwd(buffer, s);
-    cout<<buffer<<endl;*/
-    
+ 
     //Open and display target im
     int n = 7;
     std::string path_temp = argv[0];
     String file_path = path_temp + "/../../../cpp/data/elephants2_mask/";
-    //String file_path = path_temp + "/../../../cpp/data/original/";
-    //String file_path = "../../../data/original/";
-    //String file_path = "../../../data/birds_masks/";
-    //String file_path = "../../../data/oies_masks/";
-    //String file_path = "../../../data/oies_bas_masks/";
-    //String file_path = "../../../data/oies2_masks/";
-    SnapshotGraph g(file_path, n, true);
 
-    vector<int> path = g.get_path();
+    //SnapshotGraph g(file_path, n, true);
+    //vector<int> path = g.get_path();
+
+    vector<int> path = { 3,2,1 };           // use the two lines above to compute the order 
+
     Vec3f v_i(1, 0, 5);
     v_i = v_i/norm(v_i);
     Sprite s(file_path, path, false, v_i);
@@ -282,18 +258,44 @@ int main(int argc, const char * argv[]) {
     //imshow("hello", im);waitKey(0);
     cout<<"Image: " << query.str() << ", with shape = "<<im.size<<endl;
     
-    //Test 3D skeleton
     Skeleton3D hip = test3D();
-    hip.updateAbsolutePosition();
+    //hip.updateAbsolutePosition();
     Vec3f v(0, 0, 1);
-    v = v/norm(v);
+    v = v/norm(v); 
     Mat rep = repere_plane(v);
 
-    cout << "debug1" << endl;
+    //auto grand_child = hip.get_child(0)->get_child(0)->get_child(0);
+    //cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root().getPos() << endl;
 
-    recuit_simule(im, v, hip);
+    Mat h = Mat::eye(3, 3, CV_32FC1);
+    Mat diag = Mat::eye(3, 3, CV_32FC1);
+    h.at<float>(0, 0) = 35;
+    h.at<float>(1, 1) = 40;
+    hip.transform(h);
+    hip.transform_translate(90, 90, 0);
+
+    //grand_child = hip.get_child(0)->get_child(0)->get_child(0);
+
+    //cout << "hip: " << hip.get_name() << hip.get_root().getAbsPos() << endl  << hip.get_root().getPos() << endl;
+    //cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root().getAbsPos() << endl;
+
+    //hip.updateAbsolutePosition();
+    //auto temp = hip.get_root().getPos();
+    //auto temp_2 = Point3f(10, 10, 10);
+    //cout << temp << temp_2;
+    //hip.get_root().setPos(temp_2);
+    //cout << "hip: " << hip.get_root().getPos() << endl;
+    Skeleton2D t = hip.project(diag);
+    //t.normalize(im.rows, im.cols);
+    Mat c = optimize(im, t);
+    auto r = iou(im, c);
+    show_merged("recuit", im, c, to_string(r[0])); waitKey(0);
+    
+    
+    //recuit_simule(im, v, hip);
 
     cout << "Key: " << key << endl;
+
 
     //double r_prec = try_and_optimize(im, v, hip, -.3, .3); waitKey();
     //double r = try_and_optimize(im, v, hip, -.3, .3); waitKey();
@@ -301,6 +303,8 @@ int main(int argc, const char * argv[]) {
     //    r_prec = r;
     //    r = try_and_optimize(im, v, hip, -.3, .3); waitKey();
     //}
+
+
     im.release();
     return 0;
 }
