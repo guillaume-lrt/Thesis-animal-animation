@@ -11,7 +11,6 @@
 
 SnapshotGraph::SnapshotGraph(String path, int n, bool cycle){
     String file = path+"graph.txt";
-    //cout << "DEBUG1: " << file << endl;
     try{
         load_from_txt(file);
         
@@ -45,26 +44,25 @@ SnapshotGraph::SnapshotGraph(String path, int n, bool cycle){
 
 void SnapshotGraph::load_from_txt(String file){
 
-    ifstream fichier(file, ios::in);  //déclaration du flux et ouverture du fichier
+    ifstream fichier(file, ios::in);
     
-    if(fichier)  // si l'ouverture a réussi
+    if(fichier)  
     {
-        // instructions
         string ligne;
         getline(fichier, ligne);
         int n = stoi(ligne);
         g = vector<vector<double>>(n);
         for (int i = 0; i<n; i++)
             g[i] = vector<double>(n);
-        while(getline(fichier, ligne))  // tant que l'on peut mettre la ligne dans "contenu"
+        while(getline(fichier, ligne))
         {
             vector<String> v = explode(ligne, ';');
             g[stoi(v[0])][stoi(v[1])] = stod(v[2]);
         }
 
-        fichier.close();  // on referme le fichier
+        fichier.close();
     }
-    else { // sinon
+    else {
         cerr << "Fichier text non présent !" << endl;
         throw Exception();
     }
@@ -73,21 +71,20 @@ void SnapshotGraph::load_from_txt(String file){
 
 void SnapshotGraph::write_in_file(String file){
     
-    ofstream fichier(file, ios::out | ios::trunc);  //déclaration du flux et ouverture du fichier
+    ofstream fichier(file, ios::out | ios::trunc);
     
-    if(fichier)  // si l'ouverture a réussi
+    if(fichier)
     {
         int n = g.size();
         fichier<<n<<endl;
-        // instructions
         for (int i = 0; i<n; i++){
             for (int j = 0; j<n; j++){
                 fichier<<i<<";"<<j<<";"<<g[i][j]<<endl;
             }
         }
-        fichier.close();  // on referme le fichier
+        fichier.close();
     }
-    else  // sinon
+    else
         cerr << "Erreur à l'ouverture pour écrire !" << endl;
 }
 
@@ -156,7 +153,6 @@ void SnapshotGraph::select_min_max(){
 
 vector<int> SnapshotGraph::generate_path_half_cycle(int l){
     vector<int> myvector;
-    // set some values:
     for (int i=0; i<g.size(); ++i){
         if (i==start || i==end) continue;
         myvector.push_back(i);
@@ -171,7 +167,6 @@ vector<int> SnapshotGraph::generate_path_half_cycle(int l){
 
 vector<int> SnapshotGraph::generate_path_full_cycle(int l){
     vector<int> myvector;
-    // set some values:
     for (int i=0; i<g.size(); ++i){
         if (i==start || i==end) continue;
         myvector.push_back(i);
@@ -217,8 +212,6 @@ double SnapshotGraph::energy_path(int l, vector<int> p){
     
     Cd *= alpha/(l*(l-1));
     Cs *= alpha;
-    //if (verbose)
-    //    cout<<"l="<<l<<"; Cs="<<Cs<<"; Cu="<<Cu<<"; Cd="<<Cd<<endl;
     return Cs + lambda_1*Cu + lambda_2*(1-Cd);
 }
 
@@ -239,7 +232,7 @@ void SnapshotGraph::create_path(){
         min_L = 2;
     
     int L = (rand()%(g.size()-min_L+1))+min_L;
-    if (L==g.size()) cout<<"couc"<<endl;
+    if (L==g.size()) cout<<"DEBUG"<<endl;
     vector<int> curr_path = generate_path(L);
     double E = energy_path(L, curr_path);
     
@@ -248,7 +241,6 @@ void SnapshotGraph::create_path(){
     double new_E, delta_E;
     
     while (T>limit){
-        //int cause_rand= 0;
         for (int i=0; i<k; ++i){
             new_L = rand()%(g.size()-min_L) + min_L;
             new_path =  generate_path(new_L);
@@ -259,15 +251,7 @@ void SnapshotGraph::create_path(){
                 L = new_L;
                 curr_path = new_path;
             }
-            /*else if (exp(-delta_E/T)<rand()/(double)RAND_MAX){
-                //if (i%100==0) cout<<"e="<<exp(-delta_E/T)<<endl;
-                cause_rand++;
-                E = new_E;
-                L = new_L;
-                curr_path = new_path;
-            }*/
         }
-        //cout<<(double)cause_rand/500<<endl;
         T *= 0.992;
     }
     cout<<"TERMINE"<<endl;

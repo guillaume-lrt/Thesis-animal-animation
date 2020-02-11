@@ -12,6 +12,7 @@
 #include <stdio.h>
 //#include <unistd.h>
 #include <queue>
+#include <math.h>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -33,22 +34,73 @@ using namespace cv;
 //using namespace std;
 #include "string"
 
+Mat rotation_matrix(Vec3f n, double theta) {
+    // n: rotation axis; =(n_x,n_y,n_z)
+    // theta: angle, perpendicular to the axis
+    Mat res(Size(3, 3), CV_32FC1);
+
+    res.at<float>(0, 0) = cos(theta) + n[0]*n[0]*(1-cos(theta));
+    res.at<float>(0, 1) = n[0]*n[1]*(1-cos(theta)) - n[3]*sin(theta);
+    //...
+
+    return res;
+}
+
+Mat rotation_matrix(double theta) {
+    // We assume that all rotations are along the z axis, i.e n = (0,0,1)
+    Mat res(Size(3, 3), CV_32FC1);
+    res.at<float>(0, 0) = cos(theta);
+    res.at<float>(0, 1) = -sin(theta);
+    res.at<float>(0, 2) = 0;
+    res.at<float>(1, 0) = sin(theta);
+    res.at<float>(1, 1) = cos(theta);
+    res.at<float>(1, 2) = 0;
+    res.at<float>(2, 0) = 0;
+    res.at<float>(2, 1) = 0;
+    res.at<float>(2, 2) = 1;
+    return res;
+}
+
+Point3f vector_rotation(float theta, Vec3f vect) {
+    // manual rotation of vect by angle theta along z axis
+    auto co = cos(theta);
+    auto si = sin(theta);
+    auto vec_x = vect[0];
+    auto vec_y = vect[1];
+    cout << vec_x << " " << vec_y << endl;
+    Point3f res(co * vec_x - si * vec_y, co * vec_y + si * vec_x,vect[2]);
+    return res;
+}
+
+Point3f set_vector_angle(float theta, Vec3f vect) {
+    // rotate the vector s.t the angle with horizontal line is theta
+    auto vec_x = vect[0];
+    auto vec_y = vect[1];
+    float r = sqrt(vec_x * vec_x + vec_y * vec_y);
+    float alpha = vec_y >= 0 ? acos(vec_x / r) : -acos(vec_x / r);  // alpha is the current angle with the horizontal line
+    auto co = cos(-alpha);      // rotate by -alpha
+    auto si = sin(-alpha);
+    cout << vec_x << " " << vec_y << endl;
+    Point3f res(co * vec_x - si * vec_y, co * vec_y + si * vec_x, vect[2]);
+    return res;
+}
+
 
 Mat optimize(Mat& im, Skeleton2D& t){
     Mat c, c2, c3;
     c = t.toMat(im.rows, im.cols);
-    /*
-    //Min Max Scaling using bboxes
-    Mat h_rect = find_rect_match(im, c);
-    t.h_rect);
-    c2 = t.toMat(im.rows, im.cols);
     
-    //Getting rot and trans using pca
-    //Mat h = get_rot(im, c2);
-    Mat h = get_trans(im, c2);
-    t.transform(h);
-    c3 = t.toMat(im.rows, im.cols);
-    */
+    ////Min Max Scaling using bboxes
+    //Mat h_rect = find_rect_match(im, c);
+    //t.transform(h_rect);
+    //c2 = t.toMat(im.rows, im.cols);
+    //
+    ////Getting rot and trans using pca
+    ////Mat h = get_rot(im, c2);
+    //Mat h = get_trans(im, c2);
+    //t.transform(h);
+    //c3 = t.toMat(im.rows, im.cols);
+    //
     return c;
 }
 void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="None"){
@@ -132,13 +184,17 @@ double new_conf(Mat& target, Vec3f& v, Mat& rep, Skeleton3D& s, double angle_max
         }
         double angle = 2*angle_max*PI/180*(double)rand() / RAND_MAX - angle_max*PI/180;
 
+        cout << "name, abs pos and pos: " << moving->get_name() << ", " << moving->get_root()->getQuat() << ", " << moving->get_root()->getPos() << endl;
+        //cout << "v and angle: " << v << ", " << angle << endl;
         Quaternion q(angle, v);
         moving->rotate(q);
+        cout << "name, abs pos and pos: " << moving->get_name() << ", " << moving->get_root()->getAbsPos() << ", " << moving->get_root()->getPos() << endl << endl;
 
         s.updateAbsolutePosition();
         
         Skeleton2D t = s.project(rep);
-        t.normalize(target.rows, target.cols);
+        //t.normalize(target.rows, target.cols);
+        cout << t.get_name();
         c = optimize(target, t);
         r = iou(target, c);
     }
@@ -156,11 +212,11 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
     double k_b = 2*1e-4;
     
     v = v/norm(v);
-    //Mat rep = repere_plane(v);
-    Mat rep = Mat::eye(3, 3, CV_32FC1);
+    Mat rep = repere_plane(v);
+    //Mat rep = Mat::eye(3, 3, CV_32FC1);
     
     char key = 'a';
-    ofstream fichier("energy.txt", ios::out | ios::trunc);  //déclaration du flux et ouverture du fichier
+    ofstream fichier("energy.txt", ios::out | ios::trunc);  // creation of the file energy.txt
     
     if(fichier)
     {
@@ -173,6 +229,7 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
             for (int i=0; i<10; i++){
                 Skeleton3D s(s_max);
                 r = new_conf(target, v, rep, s, angle_max);
+                cout << "r: " << r << endl;
                 if (j==0){
                     k_b = r/(100*T);
                 }
@@ -182,27 +239,20 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
                     r_max = r;
                     s_max = s;
                 }
-//                else if (alea<exp(-(r_max-r)/(k_b*T))){
-//                    fichier<<"1;";
-//                    new_confs_alea++;
-//                    r_max = r;
-//                    s_max = s;
-//                }
                 else {
                     fichier<<"2;";
                     new_confs++;
                 }
                 fichier<<r_max<<";"<<T<<endl;
             }
-            //cout<<"ok:"<<new_confs_alea*100/(new_confs_alea+new_confs)<<"%"<<endl;
             if (j%5==0){
                 //cout<<"T="<<T<<endl;
-                
+
                 cout << "project" << rep << endl;
                 Skeleton2D t = s_max.project(rep);
-                t.normalize(target.rows, target.cols);
+                //t.normalize(target.rows, target.cols);
                 Mat c = optimize(target, t);
-                show_merged("recuit", target, c, to_string(r_max));//+to_string(j)
+                show_merged("recuit", target, c, to_string(r_max));
                 key = waitKey(50);
             }
             T *= decr;
@@ -215,17 +265,8 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
 }
 
 
-//void par_morceaux(Mat& target, Vec3f& v, Skeleton3D& s_max){
-//
-//    v = v/norm(v);
-//    Mat rep = repere_plane(v);
-//    
-//    char key = 'a';
-//}
-
 int main(int argc, const char * argv[]) {
  
-    //Open and display target im
     int n = 7;
     std::string path_temp = argv[0];
     String file_path = path_temp + "/../../../cpp/data/elephants2_mask/";
@@ -259,13 +300,10 @@ int main(int argc, const char * argv[]) {
     cout<<"Image: " << query.str() << ", with shape = "<<im.size<<endl;
     
     Skeleton3D hip = test3D();
-    //hip.updateAbsolutePosition();
+    hip.updateAbsolutePosition();
     Vec3f v(0, 0, 1);
     v = v/norm(v); 
     Mat rep = repere_plane(v);
-
-    //auto grand_child = hip.get_child(0)->get_child(0)->get_child(0);
-    //cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root().getPos() << endl;
 
     Mat h = Mat::eye(3, 3, CV_32FC1);
     Mat diag = Mat::eye(3, 3, CV_32FC1);
@@ -274,24 +312,29 @@ int main(int argc, const char * argv[]) {
     hip.transform(h);
     hip.transform_translate(90, 90, 0);
 
-    //grand_child = hip.get_child(0)->get_child(0)->get_child(0);
-
-    //cout << "hip: " << hip.get_name() << hip.get_root().getAbsPos() << endl  << hip.get_root().getPos() << endl;
-    //cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root().getAbsPos() << endl;
-
-    //hip.updateAbsolutePosition();
-    //auto temp = hip.get_root().getPos();
-    //auto temp_2 = Point3f(10, 10, 10);
-    //cout << temp << temp_2;
-    //hip.get_root().setPos(temp_2);
-    //cout << "hip: " << hip.get_root().getPos() << endl;
     Skeleton2D t = hip.project(diag);
     //t.normalize(im.rows, im.cols);
     Mat c = optimize(im, t);
     auto r = iou(im, c);
     show_merged("recuit", im, c, to_string(r[0])); waitKey(0);
-    
-    
+
+    auto grand_child = hip.get_child(0)->get_child(0);
+    cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root()->getPos() << endl;
+    auto grand_child_pos = grand_child->get_root();
+
+    Point3f temp = set_vector_angle(0, grand_child_pos->getPos());
+    //Point3f temp = vector_rotation(PI/4, grand_child_pos->getPos());
+    cout << "vect rota: " << temp << endl;
+    hip.get_child(0)->get_child(0)->get_root()->setPos(temp);
+
+    cout << hip.get_child(0)->get_child(0)->get_root()->getPos() << endl;
+
+    hip.updateAbsolutePosition();
+    t = hip.project(diag);
+    c = optimize(im, t);
+    r = iou(im, c);
+    show_merged("recuit", im, c, to_string(r[0])); waitKey(0);
+
     //recuit_simule(im, v, hip);
 
     cout << "Key: " << key << endl;

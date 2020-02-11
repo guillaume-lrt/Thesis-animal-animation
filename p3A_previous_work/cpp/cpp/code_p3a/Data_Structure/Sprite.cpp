@@ -19,7 +19,6 @@ void Sprite::preload_images(String ext){
         stringstream query;
         query << image_path << path[i] << ext << ".png";
         Mat im = imread(query.str(), -1);
-        //cout<<im.size()<<endl;
         try{
             resize(im, im, SIZE_I);
             preloaded_images.push_back(im);

@@ -58,9 +58,10 @@ Skeleton2D test2D(){
 }
 
 Skeleton3D test3D(){
-    //cout << "test skeleton 3D" << endl;
     vector<Skeleton3D> vide;
     Quaternion un(1, 0, 0, 0);
+
+    // head part
     Point3f pt_ptr(0, 2.3, 0);
     Joint3D ptr(pt_ptr, un);
     Skeleton3D trump(ptr, vide, "trump");
@@ -73,34 +74,60 @@ Skeleton3D test3D(){
     Skeleton3D head(h, vide, "head");
     head.add_child(nose);
     
+    // front legs
     Point3f pt_xxlf(0.1, 1, 0);
     Joint3D xxlf(pt_xxlf, un);
-    Skeleton3D xxleft(xxlf, vide, "xxlf");
+    Skeleton3D xxleftfront(xxlf, vide, "xxlf");
     Point3f pt_xxrf(-0.1, 1, 0);
     Joint3D xxrf(pt_xxrf, un);
-    Skeleton3D xxright(xxrf, vide, "xxrf");
+    Skeleton3D xxrightfront(xxrf, vide, "xxrf");
     Point3f pt_xlf(0.5, 1.4, 0);
     Joint3D xlf(pt_xlf, un);
-    Skeleton3D xleft(xlf, vide, "xlf");
-    xleft.add_child(xxleft);
+    Skeleton3D xleftfront(xlf, vide, "xlf");
+    xleftfront.add_child(xxleftfront);
     Point3f pt_xrf(-0.5, 1.4, 0);
     Joint3D xrf(pt_xrf, un);
-    Skeleton3D xright(xrf, vide, "xrf");
-    xright.add_child(xxright);
+    Skeleton3D xrightfront(xrf, vide, "xrf");
+    xrightfront.add_child(xxrightfront);
     Point3f pt_lf(.5, 2.7, -0.8);
     Joint3D lf(pt_lf, un);
-    Skeleton3D left(lf, vide, "lf");
-    left.add_child(xleft);
+    Skeleton3D leftfront(lf, vide, "lf");
+    leftfront.add_child(xleftfront);
     Point3f pt_rf(-.5, 2.7, 0.8);
     Joint3D rf(pt_rf, un);
-    Skeleton3D right(rf, vide, "rf");
-    right.add_child(xright);
-    Point3f pt_ne(3.2, 0, 0);
+    Skeleton3D rightfront(rf, vide, "rf");
+    rightfront.add_child(xrightfront);
+    Point3f pt_ne(3.8, 0, 0);
     Joint3D ne(pt_ne, un);
     Skeleton3D neck(ne, vide, "neck");
-    neck.add_child(left); neck.add_child(right); neck.add_child(head);
+    neck.add_child(leftfront); neck.add_child(rightfront); neck.add_child(head);
     
-    Point3f pt_xxblf(0.1, 1, 0);
+    // back legs
+    Point3f pt_xxlb(0.1, 1, 0);
+    Joint3D xxlb(pt_xxlb, un);
+    Skeleton3D xxleftback(xxlb, vide, "xxlb");
+    Point3f pt_xxrb(-0.1, 1, 0);
+    Joint3D xxrb(pt_xxrb, un);
+    Skeleton3D xxrightback(xxrb, vide, "xxrb");
+    Point3f pt_xlb(0.5, 1.4, 0);
+    Joint3D xlb(pt_xlb, un);
+    Skeleton3D xleftback(xlb, vide, "xlb");
+    xleftback.add_child(xxleftback);
+    Point3f pt_xrb(-0.5, 1.4, 0);
+    Joint3D xrb(pt_xrb, un);
+    Skeleton3D xrightback(xrb, vide, "xrb");
+    xrightback.add_child(xxrightback);
+    Point3f pt_lb(.5, 2.7, -0.8);
+    Joint3D lb(pt_lb, un);
+    Skeleton3D leftback(lb, vide, "lb");
+    leftback.add_child(xleftback);
+    Point3f pt_rb(-.5, 2.7, 0.8);
+    Joint3D rb(pt_rb, un);
+    Skeleton3D rightback(rb, vide, "rb");
+    rightback.add_child(xrightback);
+
+    // back legs
+    /*Point3f pt_xxblf(0.1, 1, 0);
     Joint3D xxblf(pt_xxblf, un);
     Skeleton3D xxbleft(xxblf, vide, "xxblf");
     Point3f pt_xxbrf(-0.1, 1, 0);
@@ -114,12 +141,6 @@ Skeleton3D test3D(){
     Joint3D xrbf(pt_xrbf, un);
     Skeleton3D xrightback(xrbf, vide, "xrb");
     xrightback.add_child(xxbright);
-    
-    
-    Point3f pt_xt(-0.3, 1.2, 0);
-    Joint3D xt(pt_xt, un);
-    Skeleton3D xtail(xt, vide, "xtail");
-    
     Point3f pt_lbf(0, 2.88, -1);
     Joint3D lbf(pt_lbf, un);
     Skeleton3D leftback(lbf, vide, "lb");
@@ -127,13 +148,18 @@ Skeleton3D test3D(){
     Point3f pt_rbf(-1, 2.7, 1);
     Joint3D rbf(pt_rbf, un);
     Skeleton3D rightback(rbf, vide, "rb");
-    rightback.add_child(xrightback);
+    rightback.add_child(xrightback);*/
+    
+    // tail
+    Point3f pt_xt(-0.3, 1.2, 0);
+    Joint3D xt(pt_xt, un);
+    Skeleton3D xtail(xt, vide, "xtail");
     Point3f pt_t(-0.5, 1.8, 0);
     Joint3D t(pt_t, un);
     Skeleton3D tail(t, vide, "tail");
     tail.add_child(xtail);
     
-    Point3f pt_hip_p(1, 1, 1);
+    Point3f pt_hip_p(0, 0, 0);
     Joint3D hip_p(pt_hip_p, un);
     Skeleton3D hip(hip_p, vide, "hip");
     hip.add_child(neck);hip.add_child(leftback);hip.add_child(rightback);hip.add_child(tail);

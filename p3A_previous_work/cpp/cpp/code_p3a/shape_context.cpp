@@ -26,7 +26,6 @@ vector<Point> simpleContour(const Mat& currentQuery, int n=400)
         cout<<"Adding "<<n-contoursQuery.size()<<" points"<<endl;
     for (int add=(int)contoursQuery.size()-1; add<n; add++)
     {
-        //cout<<add<<endl;
         contoursQuery.push_back(contoursQuery[dummy++]); //adding dummy values
     }
     
@@ -95,7 +94,6 @@ vector<vector<double>> ShapeContextDistance::apply(vector<Mat> vm){
         for (int j=0; j<i; ++j){
             double s = distance(contours[i], contours[j]);
             cout<<"Distance entre "<<i<<" et "<<j<<" = "<<s<<endl;
-            //cout<<s<<",";
             g[i][j] = s; g[j][i] = s;
         }
         i++;

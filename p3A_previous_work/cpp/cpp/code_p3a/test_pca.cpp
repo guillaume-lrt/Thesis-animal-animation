@@ -34,7 +34,6 @@ vector<Point> testContours(Mat& src){
     Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
     for( int i = 0; i< contours.size(); i++ )
     {
-        //cout<<"Contour n°"<<i<<" de taille "<<contours[i].size()<<endl;
         if (contours[i].size()>10){
             //Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
             //drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
@@ -123,8 +122,7 @@ void drawAxis(Mat& img, Point p, Point q, Scalar colour, const float scale)
     double hypotenuse;
     angle = atan2( (double) p.y - q.y, (double) p.x - q.x ); // angle in radians
     hypotenuse = sqrt( (double) (p.y - q.y) * (p.y - q.y) + (p.x - q.x) * (p.x - q.x));
-    //    double degrees = angle * 180 / CV_PI; // convert radians to degrees (0-180 range)
-    //    cout << "Degrees: " << abs(degrees - 180) << endl; // angle in 0-360 degrees range
+
     // Here we lengthen the arrow by a factor of scale
     q.x = (int) (p.x - scale * hypotenuse * cos(angle));
     q.y = (int) (p.y - scale * hypotenuse * sin(angle));
