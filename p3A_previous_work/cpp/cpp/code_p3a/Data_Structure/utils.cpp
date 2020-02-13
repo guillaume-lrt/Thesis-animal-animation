@@ -22,14 +22,36 @@ Point3f operator*(Mat& M, const Point3f& p)
 }
 
 Scalar iou(const Mat& M1, const Mat& M2){
+    // compare the total surface of the skeleton with the surface of the shape
     M1.convertTo(M1, CV_8U);
     M2.convertTo(M2, CV_8U);
     Mat i, u;
     bitwise_and(M1, M2, i);
     bitwise_or(M1, M2, u);
+    cout << "iou: " << i.size() << u.size() << endl;
     Scalar r = sum(i)/sum(u);
     return r;
 };
+
+Scalar local_iou(const Mat& M1, const Mat& M2) {
+    // compare the surface of the skeleton intersecting the animal shape, normalized
+    // by the total surface of the skeleton
+    M1.convertTo(M1, CV_8U);
+    M2.convertTo(M2, CV_8U);
+    Mat i, u;
+    bitwise_and(M1, M2, i);
+    Scalar r = sum(i)/sum(M2);
+    return r;
+}
+
+float get_angle(Vec3f vect) {
+    // return the angle between vect and the horizontal line, in radian
+    auto vec_x = vect[0];
+    auto vec_y = vect[1];
+    float r = sqrt(vec_x * vec_x + vec_y * vec_y);
+    float alpha = vec_y >= 0 ? acos(vec_x / r) : -acos(vec_x / r);
+    return alpha;
+}
 
 Mat find_rect_match(Mat& m1, Mat& m2){
     Mat h = Mat::zeros(3, 3, CV_32FC1);

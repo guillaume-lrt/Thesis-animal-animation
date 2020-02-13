@@ -1,5 +1,7 @@
 # Thesis-animal-animation
 
-(missing C++ files, too big)
+(missing some .vs files, too big tyo push)
+
+C++ code in p3A_previous_work\cpp\cpp\code_p3a
 
 WIP

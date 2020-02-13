@@ -24,7 +24,7 @@
 #include "Data_Structure/Joint3D.hpp"
 #include "Data_Structure/Skeleton3D.hpp"
 #include "Data_Structure/Skeleton2D.hpp"
-#include "utils.hpp"
+#include "Data_Structure/utils.hpp"
 #include "test_pca.hpp"
 #include "test_skeletons.hpp"
 
@@ -33,6 +33,7 @@
 using namespace cv;
 //using namespace std;
 #include "string"
+#include <map>
 
 Mat rotation_matrix(Vec3f n, double theta) {
     // n: rotation axis; =(n_x,n_y,n_z)
@@ -76,8 +77,7 @@ Point3f set_vector_angle(float theta, Vec3f vect) {
     // rotate the vector s.t the angle with horizontal line is theta
     auto vec_x = vect[0];
     auto vec_y = vect[1];
-    float r = sqrt(vec_x * vec_x + vec_y * vec_y);
-    float alpha = vec_y >= 0 ? acos(vec_x / r) : -acos(vec_x / r);  // alpha is the current angle with the horizontal line
+    auto alpha = get_angle(vect);  // alpha is the current angle with the horizontal line
     auto co = cos(-alpha);      // rotate by -alpha
     auto si = sin(-alpha);
     cout << vec_x << " " << vec_y << endl;
@@ -85,8 +85,7 @@ Point3f set_vector_angle(float theta, Vec3f vect) {
     return res;
 }
 
-
-Mat optimize(Mat& im, Skeleton2D& t){
+/*Mat optimize(Mat& im, Skeleton2D& t){
     Mat c, c2, c3;
     c = t.toMat(im.rows, im.cols);
     
@@ -103,12 +102,13 @@ Mat optimize(Mat& im, Skeleton2D& t){
     //
     return c;
 }
+*/
+
 void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="None"){
     Mat i = 255*Mat::ones(m1.rows, m1.cols, m1.type());
     vector<Mat> mix = {i-m1/4-m2/2, i-m1/4, i-m1/2-m2/2};
     Mat merging, out;
     merge(mix, merging);
-    
     
     resize(merging, out, Size(300, 300));
     //out = merging;
@@ -117,6 +117,30 @@ void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="N
     imshow(name, out);
     return;
 }
+
+void show_2D_image(Skeleton3D skeleton, Mat image, bool show = false) {
+    // set show = true to show the 2D skeleton (with names and arrows)
+    Mat diag = Mat::eye(3, 3, CV_32FC1);
+    //skeleton.updateAbsolutePosition();
+    Skeleton2D t = skeleton.project();
+    Mat c = t.toMat(image.rows, image.cols, show);
+    auto r = local_iou(image, c);
+    show_merged("recuit", image, c, to_string(r[0])); waitKey(0);
+}
+
+double get_score(Skeleton3D ske, Mat image, bool show = false) {
+    Skeleton2D t = ske.project_individual();
+    if (ske.get_name() == "hip") {      // get the entire skeleton
+        t = ske.project();
+    }
+    Mat c = t.toMat(image.rows, image.cols, show);
+    auto r = local_iou(image, c);
+    if (show) show_merged("recuit", image, c, to_string(r[0])); waitKey(0);
+    return r[0];
+}
+
+
+
 /*double try_and_optimize(Mat& target, Vec3f& v, Skeleton3D& s, double angle_min, double angle_max){ 
     Mat c;
 
@@ -167,7 +191,7 @@ void show_merged(const String name, const Mat& m1, const Mat& m2, String strr="N
     show_merged("m2", target, c);
     return r_max;
 }
-*/
+
 double new_conf(Mat& target, Vec3f& v, Mat& rep, Skeleton3D& s, double angle_max){
     Mat c;
     Scalar r;
@@ -263,6 +287,29 @@ void recuit_simule(Mat& target, Vec3f& v, Skeleton3D& s_max){
     else  // sinon
         cerr << "Erreur à l'ouverture !" << endl;
 }
+*/
+
+Skeleton3D get_child(string name, map<string, vector<int>> m, Skeleton3D ske) {
+    auto path = m[name];
+    Skeleton3D* res = ske.get_child(path[0]);
+    for (size_t i = 1; i < path.size();i++) {
+        //cout << res->get_child(path[i])->get_name() << endl;
+        res = res->get_child(path[i]);
+    }
+    //cout << res->get_name() << res->get_root()->getPos() << endl;
+    return *res;
+}
+
+map<string, vector<int>> create_map(Skeleton3D* ske) {
+    map<string, vector<int>> m;
+    for (size_t i = 0; i < ske->get_children_size(); i++) {
+        m[ske->get_child(i)->get_name()] = ske->get_child(i)->get_hierarchy();
+        auto temp_m = create_map(ske->get_child(i));
+        m.insert(temp_m.begin(), temp_m.end());
+    }
+    return m;
+}
+
 
 
 int main(int argc, const char * argv[]) {
@@ -312,41 +359,57 @@ int main(int argc, const char * argv[]) {
     hip.transform(h);
     hip.transform_translate(90, 90, 0);
 
+    hip.create_hierarchy();
+    hip.add_angle_constraints();
+    map<string, vector<int>> m;
+    m = create_map(&hip);       // map name of bone with its position to the root
+
+    auto child = get_child("lf", m, hip);
+    cout << "name: " << child.get_name() << child.get_root()->getPos() << endl;
+
+    /*for (auto i : m) {
+        cout << "m: " << i.first;
+        for (int j = 0; j < i.second.size(); j++) {
+             cout << "; " << i.second[j];
+        }
+        cout << endl;
+    }*/
+
+    show_2D_image(hip, im);
+    /*
     Skeleton2D t = hip.project(diag);
     //t.normalize(im.rows, im.cols);
-    Mat c = optimize(im, t);
+    Mat c = t.toMat(im.rows, im.cols);
+    //Mat c = optimize(im, t);
     auto r = iou(im, c);
     show_merged("recuit", im, c, to_string(r[0])); waitKey(0);
+    */
 
     auto grand_child = hip.get_child(0)->get_child(0);
     cout << "hip grand child: " << grand_child->get_name() << grand_child->get_root()->getPos() << endl;
+
+    child = get_child("lf", m, hip);
+
+    auto r = get_score(child, im,true);
+
+    cout << "r: " << r << endl;
+    
+    //show_2D_image(child, im);
+
     auto grand_child_pos = grand_child->get_root();
 
     Point3f temp = set_vector_angle(0, grand_child_pos->getPos());
     //Point3f temp = vector_rotation(PI/4, grand_child_pos->getPos());
     cout << "vect rota: " << temp << endl;
-    hip.get_child(0)->get_child(0)->get_root()->setPos(temp);
+    grand_child->get_root()->setPos(temp);
 
-    cout << hip.get_child(0)->get_child(0)->get_root()->getPos() << endl;
+    cout << grand_child->get_root()->getPos() << endl;
 
-    hip.updateAbsolutePosition();
-    t = hip.project(diag);
-    c = optimize(im, t);
-    r = iou(im, c);
-    show_merged("recuit", im, c, to_string(r[0])); waitKey(0);
+    show_2D_image(hip, im, true);
 
     //recuit_simule(im, v, hip);
 
     cout << "Key: " << key << endl;
-
-
-    //double r_prec = try_and_optimize(im, v, hip, -.3, .3); waitKey();
-    //double r = try_and_optimize(im, v, hip, -.3, .3); waitKey();
-    //while (r_prec!=r){
-    //    r_prec = r;
-    //    r = try_and_optimize(im, v, hip, -.3, .3); waitKey();
-    //}
-
 
     im.release();
     return 0;

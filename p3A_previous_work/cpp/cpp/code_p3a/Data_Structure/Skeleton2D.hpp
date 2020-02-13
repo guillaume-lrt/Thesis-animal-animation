@@ -65,7 +65,7 @@ class Skeleton2D{
     void updateMinMax();
     void transform(Mat& h);
     void normalize(int width, int height);
-    Mat toMat(int width, int height);
+    Mat toMat(int width, int height, bool show = false);
     
     
 };

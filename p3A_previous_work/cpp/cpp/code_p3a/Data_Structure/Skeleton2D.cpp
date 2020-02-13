@@ -47,11 +47,11 @@ void Skeleton2D::normalize(int width, int height){
     transform(m);
 }
 
-Mat Skeleton2D::toMat(int width, int height){
+Mat Skeleton2D::toMat(int width, int height, bool show){
     Mat m = Mat::zeros(width, height, CV_8U);
     Mat debug_im = 255*Mat::ones(width, height, CV_8U);
     auxMat(width, height, m, debug_im);
-    imshow("skeleton", debug_im); waitKey(10); 
+    if (show) imshow("skeleton", debug_im); waitKey(10); 
     return m;                                  
 };
 

@@ -7,6 +7,8 @@
 //
 
 #include "Skeleton3D.hpp"
+#include <map>
+#include "../constantes.hpp"
 
 void Skeleton3D::transform(Mat& h){
     Point3f p = h*(root.getPos());
@@ -31,6 +33,29 @@ void Skeleton3D::transform_translate(int x, int y, int z) {
     updateAbsolutePosition();
 }
 
+void Skeleton3D::create_hierarchy() {
+    // also add angles constraints
+    for (size_t i = 0; i < children.size(); i++) {
+        children[i].hierarchy = hierarchy;  // hierarchy of the parent
+        children[i].add_node(i);            // add its own hierarchy w.r.t the parent
+        children[i].create_hierarchy();     // iterate
+    }
+}
+
+void Skeleton3D::add_angle_constraints(){
+    if (min_angle == max_angle) {                       // if no constraint on angles
+        float alpha = get_angle(root.getPos()) * rtd;    // get angle in degrees
+        add_constraint(alpha - 35, alpha + 35);         // +- 35 degrees wrt initial position
+        cout << "angles 2: " << min_angle << "; " << alpha << "; " << max_angle << endl;
+    }
+    //angles = get_angle_constraints();
+    for (size_t i = 0; i < children.size(); i++) {
+        children[i].add_angle_constraints();
+    }
+}
+
+
+
 void Skeleton3D::updateAbsolutePosition(vector<Quaternion> q, vector<Point3f> t){
     Point3f rel_pos = this->root.getPos();
     Point3f absolute_position = rel_pos;
@@ -52,15 +77,27 @@ void Skeleton3D::updateAbsolutePosition(vector<Quaternion> q, vector<Point3f> t)
     }
 };
 
-Skeleton2D Skeleton3D::project(Mat& h){
+Skeleton2D Skeleton3D::project(){
     vector<Skeleton2D> liste;
     for (size_t i=0; i<children.size(); i++){
-        liste.push_back(children[i].project(h));
+        liste.push_back(children[i].project());
     }
-    Point3f aux = h*this->root.getAbsPos();
+    Point3f aux = this->root.getAbsPos();
     Point3f p_project(aux.x, aux.y, 1);
     return Skeleton2D(p_project, liste, name);
 };
+
+Skeleton2D Skeleton3D::project_individual() {
+    // only project 1 bone, not the entire skeleton
+    vector<Skeleton2D> liste;
+    vector<Skeleton2D> liste_temp;
+    Point3f aux_temp = this->root.getAbsPos();
+    Point3f project_temp(aux_temp.x, aux_temp.y, 1);
+    liste.push_back(Skeleton2D(project_temp, liste_temp, name));
+    Point3f aux = this->root.getAbsPos() - this->root.getPos();     // <=> get Abs Position of the parent
+    Point3f p_project(aux.x, aux.y, 1);
+    return Skeleton2D(p_project, liste, name);
+}
 
 void Skeleton3D::rotate(Quaternion q){
     Quaternion qf;

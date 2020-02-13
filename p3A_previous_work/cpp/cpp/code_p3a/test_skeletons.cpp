@@ -64,7 +64,7 @@ Skeleton3D test3D(){
     // head part
     Point3f pt_ptr(0, 2.3, 0);
     Joint3D ptr(pt_ptr, un);
-    Skeleton3D trump(ptr, vide, "trump");
+    Skeleton3D trump(ptr, vide,"trump");
     Point3f pt_n(1, 2, 0);
     Joint3D n(pt_n, un);
     Skeleton3D nose(n, vide, "nose");

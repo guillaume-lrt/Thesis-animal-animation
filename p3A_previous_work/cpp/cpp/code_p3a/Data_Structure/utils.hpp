@@ -22,6 +22,7 @@ using namespace cv;
 Point3f operator*(Mat& M, const Point3f& p);
 
 Scalar iou(const Mat& M1, const Mat& M2);
+Scalar local_iou(const Mat& M1, const Mat& M2);
 Mat find_rect_match(Mat& m1, Mat& m2);
 Mat transform_rect(Mat& m1, Mat& m2);
 Mat transform_im(Mat& h, Mat& m2);
@@ -38,5 +39,6 @@ double variance (vector<vector<double>>& v , double mean);
 
 const vector<String> explode(const String& s, const char& c);
 
+float get_angle(Vec3f vect);
 
 #endif /* utils_h */

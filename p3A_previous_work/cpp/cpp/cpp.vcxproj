@@ -155,7 +155,6 @@
     <ClCompile Include="code_p3a\shape_context.cpp" />
     <ClCompile Include="code_p3a\test_pca.cpp" />
     <ClCompile Include="code_p3a\test_skeletons.cpp" />
-    <ClCompile Include="code_p3a\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code_p3a\animating.hpp" />
@@ -169,7 +168,6 @@
     <ClInclude Include="code_p3a\shape_context.hpp" />
     <ClInclude Include="code_p3a\test_pca.hpp" />
     <ClInclude Include="code_p3a\test_skeletons.hpp" />
-    <ClInclude Include="code_p3a\utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
