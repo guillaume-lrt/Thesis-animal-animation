@@ -46,7 +46,7 @@ void Skeleton3D::add_angle_constraints(){
     if (min_angle == max_angle) {                       // if no constraint on angles
         float alpha = get_angle(root.getPos()) * rtd;    // get angle in degrees
         add_constraint(alpha - 35, alpha + 35);         // +- 35 degrees wrt initial position
-        cout << "angles 2: " << min_angle << "; " << alpha << "; " << max_angle << endl;
+        //cout << name << ": " << min_angle << "; " << alpha << "; " << max_angle << endl;
     }
     //angles = get_angle_constraints();
     for (size_t i = 0; i < children.size(); i++) {

@@ -47,25 +47,25 @@ void Skeleton2D::normalize(int width, int height){
     transform(m);
 }
 
-Mat Skeleton2D::toMat(int width, int height, bool show){
+Mat Skeleton2D::toMat(int width, int height, bool show, string shape){
     Mat m = Mat::zeros(width, height, CV_8U);
     Mat debug_im = 255*Mat::ones(width, height, CV_8U);
-    auxMat(width, height, m, debug_im);
-    if (show) imshow("skeleton", debug_im); waitKey(10); 
+    auxMat(width, height, m, debug_im,shape);
+    if (show) imshow("skeleton", debug_im); waitKey(0); 
     return m;                                  
 };
 
-void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im){
+void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im,string shape){
     Point3f p = this->pos;
     Size pt(2, 2);
     Point p2(p.x/p.z, p.y/p.z);
     for (size_t i=0; i<children.size(); i++){
-        oneMat(width, height, dest, debug_im, i);
-        children[i].auxMat(width, height, dest, debug_im);
+        oneMat(width, height, dest, debug_im, i,shape);
+        children[i].auxMat(width, height, dest, debug_im,shape);
     }
 };
 
-void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i){
+void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i, string shape){
     Point3f p = this->pos;
     Size pt(2, 2);
     Point p2(p.x/p.z, p.y/p.z);
@@ -93,7 +93,12 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i){
     }
     else {
         Size s(d / 2, 10);
-        ellipse(dest, center, s, theta*180/PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
+        if (shape == "ellipse") ellipse(dest, center, s, theta * 180 / PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
+        else if (shape == "circle") circle(dest, p_dest, 1, Scalar(255, 0, 0), cv::FILLED);
+        else {
+            ellipse(dest, center, s, theta * 180 / PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
+            circle(dest, p_dest, 0.5, Scalar(255, 0, 0), cv::FILLED);
+        }
     }
     arrowedLine(debug_im, p2, p_dest, Scalar(0, 0, 0));
     putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));

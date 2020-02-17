@@ -27,8 +27,8 @@ class Skeleton2D{
     vector<Skeleton2D> children;
     String name;
     vector<double> minMax;
-    void auxMat(int width, int height, Mat& dest, Mat& d);
-    void oneMat(int width, int height, Mat& dest, Mat& debug_im, int i);
+    void auxMat(int width, int height, Mat& dest, Mat& d, string shape);
+    void oneMat(int width, int height, Mat& dest, Mat& debug_im, int i, string shape);
     public :
     Skeleton2D(Point3f& p, vector<Skeleton2D> c, String n){
         this->pos = p/p.z;
@@ -65,7 +65,7 @@ class Skeleton2D{
     void updateMinMax();
     void transform(Mat& h);
     void normalize(int width, int height);
-    Mat toMat(int width, int height, bool show = false);
+    Mat toMat(int width, int height, bool show = false, string shape = "ellipse");
     
     
 };

@@ -39,6 +39,6 @@ double variance (vector<vector<double>>& v , double mean);
 
 const vector<String> explode(const String& s, const char& c);
 
-float get_angle(Vec3f vect);
+double get_angle(Vec3f vect);
 
 #endif /* utils_h */

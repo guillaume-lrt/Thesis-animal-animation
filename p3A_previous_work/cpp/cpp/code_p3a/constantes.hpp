@@ -16,8 +16,8 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #define PI 3.14159265
-#define rtd 180/PI		// radiantodegree: radian * rtd = degree 
-#define dtr PI/180
+#define rtd double(180/PI)		// radiantodegree: radian * rtd = degree 
+#define dtr double(PI/180)
 
 const cv::Size SIZE_I(300,300);
 

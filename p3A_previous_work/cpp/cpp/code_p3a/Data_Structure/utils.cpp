@@ -44,12 +44,12 @@ Scalar local_iou(const Mat& M1, const Mat& M2) {
     return r;
 }
 
-float get_angle(Vec3f vect) {
+double get_angle(Vec3f vect) {
     // return the angle between vect and the horizontal line, in radian
     auto vec_x = vect[0];
     auto vec_y = vect[1];
-    float r = sqrt(vec_x * vec_x + vec_y * vec_y);
-    float alpha = vec_y >= 0 ? acos(vec_x / r) : -acos(vec_x / r);
+    auto r = sqrt(vec_x * vec_x + vec_y * vec_y);
+    double alpha = vec_y >= 0 ? acos(vec_x / r) : -acos(vec_x / r);
     return alpha;
 }
 

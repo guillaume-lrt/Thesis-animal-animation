@@ -62,7 +62,7 @@ Skeleton3D test3D(){
     Quaternion un(1, 0, 0, 0);
 
     // head part
-    Point3f pt_ptr(0, 2.3, 0);
+    Point3f pt_ptr(0, 2, 0);
     Joint3D ptr(pt_ptr, un);
     Skeleton3D trump(ptr, vide,"trump");
     Point3f pt_n(1, 2, 0);
@@ -100,6 +100,7 @@ Skeleton3D test3D(){
     Point3f pt_ne(3.8, 0, 0);
     Joint3D ne(pt_ne, un);
     Skeleton3D neck(ne, vide, "neck");
+    neck.add_constraint(0, 1);                     // keep the back horizontal
     neck.add_child(leftfront); neck.add_child(rightfront); neck.add_child(head);
     
     // back legs

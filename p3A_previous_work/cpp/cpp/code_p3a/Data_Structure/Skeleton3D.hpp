@@ -26,8 +26,8 @@ class Skeleton3D{
     vector<Skeleton3D> children;
     String name;
     vector<int> hierarchy;      // give the position w.r.t the root of the skeleton
-    float min_angle;       // minimal angle in degree with the horizontal line
-    float max_angle;       // \in [-180,180]
+    double min_angle;       // minimal angle in degree with the horizontal line
+    double max_angle;       // \in [-180,180]
     public :
     
         Skeleton3D(Joint3D& r, vector<Skeleton3D>& c, String n){
@@ -43,15 +43,17 @@ class Skeleton3D{
         void add_node(int d) {
             this->hierarchy.push_back(d);
         }
-        void add_constraint(float min, float max) {
+        void add_constraint(double min, double max) {
             this->min_angle = min;
             this->max_angle = max;
         }
-        vector<float> get_angle_constraints() {
-            vector<float> v(min_angle, max_angle);
-            return v;
+        double get_min_angle_constraints() {
+            return min_angle;
         }
-        size_t get_children_size(){
+        double get_max_angle_constraints() {
+            return max_angle;
+        }
+        int get_children_size(){
             return children.size();
         }
         Skeleton3D* get_child(int i){
