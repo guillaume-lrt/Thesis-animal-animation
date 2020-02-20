@@ -45,7 +45,7 @@ void Skeleton3D::create_hierarchy() {
 void Skeleton3D::add_angle_constraints(){
     if (min_angle == max_angle) {                       // if no constraint on angles
         float alpha = get_angle(root.getPos()) * rtd;    // get angle in degrees
-        add_constraint(alpha - 35, alpha + 35);         // +- 35 degrees wrt initial position
+        add_constraint(alpha - 45, alpha + 45);         // +- 35 degrees wrt initial position
         //cout << name << ": " << min_angle << "; " << alpha << "; " << max_angle << endl;
     }
     //angles = get_angle_constraints();

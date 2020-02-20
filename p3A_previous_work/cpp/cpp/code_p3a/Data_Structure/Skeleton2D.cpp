@@ -51,8 +51,8 @@ Mat Skeleton2D::toMat(int width, int height, bool show, string shape){
     Mat m = Mat::zeros(width, height, CV_8U);
     Mat debug_im = 255*Mat::ones(width, height, CV_8U);
     auxMat(width, height, m, debug_im,shape);
-    if (show) imshow("skeleton", debug_im); waitKey(0); 
-    return m;                                  
+    if (show) imshow("skeleton", debug_im); waitKey(1); 
+    return m;
 };
 
 void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im,string shape){

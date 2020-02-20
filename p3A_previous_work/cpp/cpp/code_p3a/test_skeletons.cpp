@@ -81,6 +81,7 @@ Skeleton3D test3D(){
     Point3f pt_xxrf(-0.1, 1, 0);
     Joint3D xxrf(pt_xxrf, un);
     Skeleton3D xxrightfront(xxrf, vide, "xxrf");
+    xxrightfront.add_constraint(45,170);
     Point3f pt_xlf(0.5, 1.4, 0);
     Joint3D xlf(pt_xlf, un);
     Skeleton3D xleftfront(xlf, vide, "xlf");
