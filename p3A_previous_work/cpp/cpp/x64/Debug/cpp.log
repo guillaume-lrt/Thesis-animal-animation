@@ -22,28 +22,19 @@ C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_
           ]
 C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Skeleton3D.hpp(57,1): warning C4267: 'return' : conversion de 'size_t' en 'int', perte possible de données
 C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\Data_Structure\Sprite.hpp(43,1): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(43,38): warning C4244: '=' : conversion de 'double' en '_Tp', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(186,38): warning C4244: '=' : conversion de 'double' en '_Tp', perte possible de données
           with
           [
               _Tp=float
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(44,52): warning C4244: '=' : conversion de 'double' en '_Tp', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(187,52): warning C4244: '=' : conversion de 'double' en '_Tp', perte possible de données
           with
           [
               _Tp=float
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(85,53): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
-          with
-          [
-              _Tp=float
-          ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(85,28): warning C4244: 'argument' : conversion de 'double' en '_Tp', perte possible de données
-          with
-          [
-              _Tp=float
-          ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(95,38): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(463,55): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(229,32): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(239,38): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(592,55): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
           with
           [
               _Ty=double
@@ -52,7 +43,7 @@ C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_
           [
               _Tp=float
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(463,46): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(592,46): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
           with
           [
               _Ty=double
@@ -61,7 +52,7 @@ C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_
           [
               _Tp=float
           ]
-C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(463,37): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
+C:\Users\ptitg\Documents\Thesis-animal-animation\p3A_previous_work\cpp\cpp\code_p3a\main.cpp(592,37): warning C4244: 'argument' : conversion de '_Ty' en '_Tp', perte possible de données
           with
           [
               _Ty=double

@@ -92,7 +92,7 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i, 
         rectangle(dest, pt1, pt2, Scalar(255, 255, 255), cv::FILLED);
     }
     else {
-        Size s(d / 2, 10);
+        Size s(d / 2, 5*2);
         if (shape == "ellipse") ellipse(dest, center, s, theta * 180 / PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
         else if (shape == "circle") circle(dest, p_dest, 1, Scalar(255, 0, 0), cv::FILLED);
         else {
@@ -101,7 +101,7 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i, 
         }
     }
     arrowedLine(debug_im, p2, p_dest, Scalar(0, 0, 0));
-    putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));
+    //putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));
 };
 
 

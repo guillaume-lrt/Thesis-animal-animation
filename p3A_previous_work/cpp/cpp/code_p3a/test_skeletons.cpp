@@ -65,6 +65,7 @@ Skeleton3D test3D(){
     Point3f pt_ptr(0, 2, 0);
     Joint3D ptr(pt_ptr, un);
     Skeleton3D trump(ptr, vide,"trump");
+    trump.add_constraint(100, 80);
     Point3f pt_n(1, 2, 0);
     Joint3D n(pt_n, un);
     Skeleton3D nose(n, vide, "nose");
@@ -81,7 +82,7 @@ Skeleton3D test3D(){
     Point3f pt_xxrf(-0.1, 1, 0);
     Joint3D xxrf(pt_xxrf, un);
     Skeleton3D xxrightfront(xxrf, vide, "xxrf");
-    xxrightfront.add_constraint(45,170);
+    //xxrightfront.add_constraint(0,170);
     Point3f pt_xlf(0.5, 1.4, 0);
     Joint3D xlf(pt_xlf, un);
     Skeleton3D xleftfront(xlf, vide, "xlf");

@@ -44,6 +44,14 @@ Scalar local_iou(const Mat& M1, const Mat& M2) {
     return r;
 }
 
+Scalar dist_transf_iou(const Mat& M1, const Mat& M2) {
+    //cout << M1.depth() << " " << M2.depth() << endl;
+    Mat M3 = M1.mul(M2);
+    //imshow("debug", M3); waitKey(0);
+    Scalar r = sum(M3) / sum(M2);
+    return r;
+}
+
 double get_angle(Vec3f vect) {
     // return the angle between vect and the horizontal line, in radian
     auto vec_x = vect[0];
