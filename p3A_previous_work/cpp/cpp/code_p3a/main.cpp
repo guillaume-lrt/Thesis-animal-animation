@@ -837,7 +837,7 @@ int main(int argc, const char * argv[]) {
         images[i] = load_image(i, file_path);
         skeletons.push_back(final_ske(i, file_path));
         cout << "end" << endl;
-        show_2D_image(skeletons[i], images[i], true);
+        //show_2D_image(skeletons[i], images[i], true);
     }
 
     auto hip = skeletons[0];
