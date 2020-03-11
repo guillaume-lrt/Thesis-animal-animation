@@ -14,8 +14,9 @@
 #include "Data_Structure/Skeleton3D.hpp"
 #include "Data_Structure/Skeleton2D.hpp"
 
-Skeleton3D test3D();
-Skeleton2D test2D();
-Skeleton3D test_bird();
+Skeleton3D elephant_skeleton();
+Skeleton3D zebra_skeleton();
+//Skeleton2D test2D();
+//Skeleton3D test_bird();
 
 #endif /* test_skeletons_hpp */

@@ -45,10 +45,10 @@ class Quaternion{
             this->x.push_back(p.z);
         };
         Quaternion(double angle, Vec3f& v){
-            this->x.push_back(cos(angle));
-            this->x.push_back(sin(angle)*v[0]);
-            this->x.push_back(sin(angle)*v[1]);
-            this->x.push_back(sin(angle)*v[2]);
+            this->x.push_back(float(cos(angle)));
+            this->x.push_back(float(sin(angle)*v[0]));
+            this->x.push_back(float(sin(angle)*v[1]));
+            this->x.push_back(float(sin(angle)*v[2]));
         };
         std::vector<float> getX(){
             return this->x;

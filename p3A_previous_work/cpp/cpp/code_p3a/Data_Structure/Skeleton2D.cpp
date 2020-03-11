@@ -37,12 +37,12 @@ void Skeleton2D::normalize(int width, int height){
     Mat m = Mat::zeros(3, 3, CV_32FC1);
     
     //cout<<"Min et max :"<<minMax[0]<<", "<<minMax[1]<<", "<<minMax[2]<<", "<<minMax[3]<<endl;
-    float scale = min(width, height)/(max(minMax[1]-minMax[0],minMax[3]-minMax[2])+4);
+    float scale = float(min(width, height)/(max(minMax[1]-minMax[0],minMax[3]-minMax[2])+4));
     m.at<float>(0,0) = scale;
     m.at<float>(1,1) = scale;
     m.at<float>(2,2) = 1;
-    m.at<float>(0,2) = scale*(-minMax[0]);
-    m.at<float>(1,2) = scale*(-minMax[2]);
+    m.at<float>(0,2) = scale*float(-minMax[0]);
+    m.at<float>(1,2) = scale*float(-minMax[2]);
     //cout<<"m: \n"<<m<<endl;
     transform(m);
 }
@@ -59,7 +59,7 @@ void Skeleton2D::auxMat(int width, int height, Mat& dest, Mat& debug_im,string s
     Point3f p = this->pos;
     Size pt(2, 2);
     Point p2(p.x/p.z, p.y/p.z);
-    for (size_t i=0; i<children.size(); i++){
+    for (int i=0; i<children.size(); i++){
         oneMat(width, height, dest, debug_im, i,shape);
         children[i].auxMat(width, height, dest, debug_im,shape);
     }
@@ -85,23 +85,23 @@ void Skeleton2D::oneMat(int width, int height, Mat& dest, Mat& debug_im, int i, 
         theta = atan((float)vector.y/vector.x);
     }
     if (children[i].name=="nneck"){     // put "neck" if you want the neck to be a rectangle
-        Size s(d/2, 3./5*d/2);
+        Size s(int(d/2), int(3./5*d/2));
         Point pt1 = p2;
-        Point pt2 = p_dest + Point(0, 5. / 6 * d);
+        Point pt2 = p_dest + Point(0, int(5. / 6 * d));
         //cout << "point: " << d << pt1 << pt2 << endl;
         rectangle(dest, pt1, pt2, Scalar(255, 255, 255), cv::FILLED);
     }
     else {
-        Size s(d / 2, 5*2);
+        Size s(int(d / 2), 5*1.5);
         if (shape == "ellipse") ellipse(dest, center, s, theta * 180 / PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
         else if (shape == "circle") circle(dest, p_dest, 1, Scalar(255, 0, 0), cv::FILLED);
         else {
             ellipse(dest, center, s, theta * 180 / PI, 0, 360, Scalar(255, 0, 0), cv::FILLED);
-            circle(dest, p_dest, 0.5, Scalar(255, 0, 0), cv::FILLED);
+            circle(dest, p_dest, 1, Scalar(255, 0, 0), cv::FILLED);
         }
     }
     arrowedLine(debug_im, p2, p_dest, Scalar(0, 0, 0));
-    //putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));
+    putText(debug_im, children[i].name, center, FONT_HERSHEY_SIMPLEX, 0.4, Scalar(0,0, 0));
 };
 
 

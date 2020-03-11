@@ -42,7 +42,7 @@ class SnapshotGraph{
     vector<int> path;
     vector<bool> outliers;
     private:
-        double distance(int i, int j);
+        //double distance(int i, int j);
         vector<int> generate_path(int l);
         vector<int> generate_path_half_cycle(int l);
         vector<int> generate_path_full_cycle(int l);

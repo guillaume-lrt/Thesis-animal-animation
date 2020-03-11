@@ -165,7 +165,6 @@
     <ClInclude Include="code_p3a\Data_Structure\Skeleton3D.hpp" />
     <ClInclude Include="code_p3a\Data_Structure\Sprite.hpp" />
     <ClInclude Include="code_p3a\Data_Structure\utils.hpp" />
-    <ClInclude Include="code_p3a\main.h" />
     <ClInclude Include="code_p3a\shape_context.hpp" />
     <ClInclude Include="code_p3a\test_pca.hpp" />
     <ClInclude Include="code_p3a\test_skeletons.hpp" />

@@ -32,11 +32,11 @@ Mat rotateY(double theta);
 Mat repere_plane(const Vec3f& d);
 Mat repere_plane23(const Vec3f& d);
 
-double avg (vector<double>& v);
-double avg (vector<vector<double>>& v);
+double avg(vector<double>& v);
+double avg(vector<vector<double>>& v);
 
-double variance (vector<double>& v , double mean);
-double variance (vector<vector<double>>& v , double mean);
+double variance(vector<double>& v, double mean);
+double variance(vector<vector<double>>& v, double mean);
 
 const vector<String> explode(const String& s, const char& c);
 

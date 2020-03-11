@@ -44,7 +44,7 @@ void Skeleton3D::create_hierarchy() {
 
 void Skeleton3D::add_angle_constraints(){
     if (min_angle == max_angle) {                       // if no constraint on angles
-        float alpha = get_angle(root.getPos()) * rtd;    // get angle in degrees
+        double alpha = get_angle(root.getPos()) * rtd;    // get angle in degrees
         add_constraint(alpha - 65, alpha + 65);         // +- 35 degrees wrt initial position
         //cout << name << ": " << min_angle << "; " << alpha << "; " << max_angle << endl;
     }
@@ -97,6 +97,18 @@ Skeleton2D Skeleton3D::project_individual() {
     Point3f aux = this->root.getAbsPos() - this->root.getPos();     // <=> get Abs Position of the parent
     Point3f p_project(aux.x, aux.y, 1);
     return Skeleton2D(p_project, liste, name);
+}
+
+void Skeleton3D::create_map(){
+    for (int i = 0; i < children.size(); i++) {
+        this->child_map[children[i].get_name()] = children[i].get_hierarchy();
+
+        if (children[i].get_children_size() != 0) {
+            this->children[i].create_map();
+            auto temp = children[i].get_children_map();
+            this->child_map.insert(temp.begin(), temp.end());
+        }
+    }
 }
 
 void Skeleton3D::rotate(Quaternion q){
