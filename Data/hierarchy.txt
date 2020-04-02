@@ -1,0 +1,1 @@
+[['neck','head'],['hip','lb'],['neck','lf'],['hip','neck'],['head','nose'],['hip','rb'],['neck','rf'],['nose','trump'],['lb','xlb'],['lf','xlf'],['rb','xrb'],['rf','xrf'],['xlb','xxlb'],['xlf','xxlf'],['xrb','xxrb'],['xrf','xxrf'],[]]

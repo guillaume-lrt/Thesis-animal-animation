@@ -166,6 +166,7 @@ double get_score(Skeleton3D ske, Mat image, bool show = false, string shape = "e
     Mat c = t.toMat(image.rows, image.cols, show, shape);
     auto r = local_iou(image, c);
     if (show) show_merged("recuit", image, c, to_string(r[0])); waitKey(10);
+    //if (shape == "circle") return r[0] > 0.99 ? 1 : r[0];
     return r[0];
 }
 
@@ -387,6 +388,7 @@ double get_border(Skeleton3D* ske, Skeleton3D* bone, Mat im, int signe, double a
     //cout << endl << "name: " << bone->get_name() << endl;
     //int signe = direction == "r" ? -1 : 1;              // if direction == r, angle is negative
     auto is_inside = get_score(*bone, im, false, "circle") < 1 ? 0 : 1;      // if is_inside == 1 => extremity is inside the shape : else 0
+    //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
     auto min_angles = bone->get_min_angle_constraints();
     auto max_angles = bone->get_max_angle_constraints();
     //cout << "max angle bis: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl;
@@ -394,7 +396,7 @@ double get_border(Skeleton3D* ske, Skeleton3D* bone, Mat im, int signe, double a
     while (get_score(*bone, im, false, "circle") == is_inside && min_angles <= temp && temp <= max_angles) {
         set_vector_rotation(ske, bone, signe * angle);
         temp = get_angle(bone->get_root()->getPos()) * double(rtd);
-        //cout << "angle: " << temp << endl;
+        //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
     }
     //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
     //set_vector_rotation(ske, bone, -signe * angle);
@@ -413,18 +415,19 @@ void place_middle(Skeleton3D* ske, Skeleton3D* bone, Mat im) {
 
     auto first_angle = get_border(ske, bone, im, d, 5);
     // auto n = log(10/2)/log(4);
-    //cout << "first angle" << endl;
+    //cout << "first angle: " << first_angle << endl;
     if (r == 1) d *= -1;
     set_vector_rotation(ske, bone, double(d) * 10);
     auto second_angle = get_border(ske, bone, im, d, 5);
     auto average = (second_angle + first_angle) / 2;
-    /*cout << "name: " << bone->get_name() << endl;
-    cout << "first angle: " << first_angle << endl;
-    cout << "second angle: " << second_angle << endl;
-    cout << "average: " << average << endl;
-    cout << "max angle: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl << endl;
-    */set_vector_rotation(ske, bone, average, "set angle");
+    //cout << "name: " << bone->get_name() << endl;
+    //cout << "first angle: " << first_angle << endl;
+    //cout << "second angle: " << second_angle << endl;
+    //cout << "average: " << average << endl;
+    //cout << "max angle: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl << endl;
+    set_vector_rotation(ske, bone, average, "set angle");
     //show_2D_image(*ske, im, true);
+
     for (int i = 0; i < bone->get_children_size();i++) {
         place_middle(ske, bone->get_child(i), im);
     }
@@ -680,7 +683,7 @@ int dist_get_direction(Skeleton3D* ske, Skeleton3D* bone, Mat dist_im) {
     set_vector_rotation(ske, bone, angle);
     auto ll = dist_score(bone, dist_im);
 
-    cout << "Debug angle: " << r << ", " << rr << ", " << l << ", " << ll << endl;
+    std::cout << "Debug angle: " << r << ", " << rr << ", " << l << ", " << ll << endl;
 
     set_vector_rotation(ske, bone, 2 * angle);          // go to initial position
     return (r + rr) / 2 < (l + ll) / 2 ? 1 : -1;
@@ -810,6 +813,12 @@ Skeleton3D final_ske(int i_query, String file_path) {
     bone = get_child("rf", m, &hip);
     set_vector_rotation(&hip, bone, -5);
 
+    //bone = get_child("xxrf", m, &hip);
+    //set_vector_rotation(&hip, bone, 10);
+
+    //bone = get_child("xxlf", m, &hip);
+    //set_vector_rotation(&hip, bone, -5);
+
     if (animal == "zebra") {
         auto bone = get_child("head", m, &hip);
         set_vector_rotation(&hip, bone, -25, "set angle");
@@ -822,7 +831,7 @@ Skeleton3D final_ske(int i_query, String file_path) {
     if (method == "distance") {
         Mat dist_transf = get_distance_transform(im, false);
         Mat dist_transf_inver = get_distance_transform(255 - im, false);
-        cout << dist_transf.type() << endl;
+        std::cout << dist_transf.type() << endl;
         Mat ima = (dist_transf - dist_transf_inver + 1) / 2;
         ima = ima.mul(ima);
         //Mat ima = dist_transf;
@@ -951,21 +960,21 @@ vector<Skeleton3D> make_animation(vector<Skeleton3D> skeletons, vector<float> or
 
     for (int i = 1; i < n-1;i++) {
         j = i + 1;
-        cout << j << "-th image" << endl;
+        std::cout << j << "-th image" << endl;
         vector<Skeleton3D> temp = interpolation(skeletons[order[i]], skeletons[order[j]], nb_images);
         ske_interpo.insert(ske_interpo.end(), temp.begin(), temp.end());
         ske_interpo.push_back(skeletons[order[j]]);
     }
     j = n - 1;
     Skeleton3D old_ske = skeletons[order[j]];
-    cout << j << "-th image" << endl;
+    std::cout << j << "-th image" << endl;
     leg_changing(&skeletons[order[j]]);
     vector<Skeleton3D> temp = interpolation(old_ske, skeletons[order[j]], nb_images);
     ske_interpo.insert(ske_interpo.end(), temp.begin(), temp.end());
     ske_interpo.push_back(skeletons[order[j]]);
     for (int i = n - 1; i > 0; i--) {
         j = i - 1;
-        cout << j << "-th image" << endl;
+        std::cout << j << "-th image" << endl;
         leg_changing(&skeletons[order[j]]);
         temp = interpolation(skeletons[order[i]], skeletons[order[j]], nb_images);
         ske_interpo.insert(ske_interpo.end(), temp.begin(), temp.end());
@@ -993,7 +1002,7 @@ vector<Skeleton3D> make_animation_v2(vector<Skeleton3D> skeletons, vector<Skelet
         curr_ske = order[i] > 0 ? skeletons[order[i]] : inverse_skeletons[abs(order[i])];
         next_ske = order[i + 1] > 0 ? skeletons[order[i + 1]] : inverse_skeletons[abs(order[i + 1])];
 
-        cout << "order: " << order[i] << ", " << order[i+1] << endl;
+        std::cout << "order: " << order[i] << ", " << order[i+1] << endl;
         temp = interpolation(curr_ske, next_ske, nb_images);
         ske_interpo.insert(ske_interpo.end(), temp.begin(), temp.end());
         ske_interpo.push_back(next_ske);
@@ -1008,7 +1017,7 @@ void show_animation(vector<Skeleton3D> skeletons, Mat images) {
         show_2D_image(skeletons[i], images, true, false);
         i += 1;
         //cout << i << endl;
-        if (i == skeletons.size()) { cout << "beginning cycle" << endl; i = 0; }
+        if (i == skeletons.size()) { std::cout << "beginning cycle" << endl; i = 0; }
     }
 }
 
@@ -1147,8 +1156,11 @@ int main(int argc, const char * argv[]) {
     srand(time(NULL));
  
     std::string path_temp = argv[0];
+    std::cout << path_temp << endl;
     String file_path = path_temp + "/../../../cpp/data/elephants2_mask/"; int const n = 4;
     //String file_path = path_temp + "/../../../cpp/data/zebra/"; int const n = 16;
+
+    String export_path = path_temp + "/../../../../../Data/";
 
     //SnapshotGraph g(file_path, n, true);
     //vector<int> path = g.get_path();
@@ -1182,13 +1194,13 @@ int main(int argc, const char * argv[]) {
     Skeleton3D hip = final_ske(0, file_path);
     Mat im = load_image(0, file_path);
 
-    show_2D_image(hip, im, true);
+    //show_2D_image(hip, im, true);
     
     for (int i = 0; i < n; i++) {
-        cout << "beginning" << endl;
+        std::cout << "beginning" << endl;
         images[i] = load_image(i, file_path);
         skeletons.push_back(final_ske(i, file_path));
-        cout << "end" << endl;
+        std::cout << "end" << endl;
         auto pos = skeletons[i].get_root()->getPos();
         //show_2D_image(skeletons[i], images[i], true);
         skeletons[i].transform_translate(100-pos.x, 100-pos.y, 0);
@@ -1207,13 +1219,13 @@ int main(int argc, const char * argv[]) {
         //cout << images[i].size << endl;
     }
 
-    cout << "         lf       rf       lb       rb" << endl;
+    std::cout << "         lf       rf       lb       rb" << endl;
     for (auto i : angles) {
-        cout << i.first << " => " ;
+        std::cout << i.first << " => " ;
         for (auto j : i.second) {
-            cout << j << "  ";
+            std::cout << j << "  ";
         }
-        cout << endl;
+        std::cout << endl;
     }
 
     //int pos = rand() % angles_keys.size();
@@ -1239,29 +1251,79 @@ int main(int argc, const char * argv[]) {
     }
 
     for (auto i : order_string) {
-        cout << i.first << " => ";
+        std::cout << i.first << " => ";
         for (auto j : i.second) {
-            cout << j << "  ";
+            std::cout << j << "  ";
         }
-        cout << endl;
+        std::cout << endl;
     }
     //vector<float> order = { 0.1, 1, 3, -0.1, -1, -3, 0.1 };     // use 0.1 instead of 0 to keep the sign
                                                                   // need to be periodic (order[0] = order[-1])
     //vector<float> order = { -0.1, -1, -2, -3, 0.1, 1, 2, 3, -0.1 };     // score: 2.3679
 
+
+
     vector<float> order = convert_string_order(order_string.begin()->second);   // score: 1.89043
-    cout << "score: " << score_order(order, angles) << endl;
+    //vector<float> order = { 3, -1, -2, -0.1, -3, 2, 1, 0.1, 3 };
+    std::cout << "score: " << score_order(order, angles) << endl;
 
     int nb_images = 10;
 
     //vector<Skeleton3D> ske_interpo = make_animation(skeletons, order, 10);
     vector<Skeleton3D> ske_interpo = make_animation_v2(skeletons, inverse_skeletons, order, nb_images);
 
-    show_animation(ske_interpo,images[0]);
+    //show_animation(ske_interpo,images[0]);
    
     //recuit_simule(im, v, hip);
 
-    cout << "Key: " << key << endl;
+    std::ofstream outfile(export_path + "animation.txt");
+    auto m = ske_interpo[0].get_children_map();
+
+    // export all different positions of the animation
+    for (auto i : ske_interpo) {
+        //cout << i.get_root()->getPos() << endl;
+        outfile << "{";
+        bool b = true;
+        outfile << "'hip': " << i.get_root()->getPos() << ",";
+        for (auto it = m.cbegin(); it != m.cend(); ++it) {
+            //outfile << get_child(it->first, m, &i)->get_name() << ": ";
+            //cout << "debug: " << it->first << ", " << it->second.size() << endl;
+            //if (it->second.size() == 1 && b) {
+            //    outfile << "'hip': " << i.get_root()->getPos() << ",";          // link to the hip
+            //    b = false;
+            //}
+            if (true) {
+                auto temp_m = m;
+                temp_m[it->first].pop_back();
+                outfile << "'" <<  it->first << "': " << get_child(it->first, m, &i)->get_root()->getAbsPos() << ",";
+            }
+            //outfile << "," << get_child(it->first, m, &i)->get_root()->getAbsPos() << "],[";
+        }
+        outfile << "'nul':[]}" << endl;
+    }
+
+    outfile.close();
+
+    std::ofstream outfile1(export_path + "hierarchy.txt");
+    m = ske_interpo[0].get_children_map();
+
+    // export all different positions of the animation
+    outfile1 << "[[";
+    for (auto it = m.cbegin(); it != m.cend(); ++it) {
+        if (it->second.size()==1) {
+            outfile1 << "'hip'" << ",";          // link to the hip
+        }
+        else {
+            auto temp_m = m;
+            temp_m[it->first].pop_back();           // remove the last element => path to get the parent of 'it'
+            outfile1 << "'" << get_child(it->first, temp_m, &ske_interpo[0])->get_name() << "',";
+        }
+        outfile1 << "'" << get_child(it->first, m, &ske_interpo[0])->get_name() << "'],[";
+    }
+    outfile1 << "]]";
+    outfile1.close();
+
+    std::cout << "Key: " << key << endl;
 
     //im.release();
     return 0;

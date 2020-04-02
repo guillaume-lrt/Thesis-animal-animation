@@ -130,18 +130,18 @@ Skeleton3D elephant_skeleton(){
     rightback.add_child(xrightback);
     
     // tail
-    Point3f pt_xt(float(-0.3), float(1.2), 0);
-    Joint3D xt(pt_xt, un);
-    Skeleton3D xtail(xt, vide, "xtail");
-    Point3f pt_t(float(-0.5), float(1.8), 0);
-    Joint3D t(pt_t, un);
-    Skeleton3D tail(t, vide, "tail");
-    tail.add_child(xtail);
+    //Point3f pt_xt(float(-0.3), float(1.2), 0);
+    //Joint3D xt(pt_xt, un);
+    //Skeleton3D xtail(xt, vide, "xtail");
+    //Point3f pt_t(float(-0.5), float(1.8), 0);
+    //Joint3D t(pt_t, un);
+    //Skeleton3D tail(t, vide, "tail");
+    //tail.add_child(xtail);
     
     Point3f pt_hip_p(0, 0, 0);
     Joint3D hip_p(pt_hip_p, un);
     Skeleton3D hip(hip_p, vide, "hip");
-    hip.add_child(neck);hip.add_child(leftback);hip.add_child(rightback);hip.add_child(tail);
+    hip.add_child(neck);hip.add_child(leftback);hip.add_child(rightback);//hip.add_child(tail);
     return hip;
 }
 
@@ -163,7 +163,7 @@ Skeleton3D zebra_skeleton() {
     Skeleton3D head(h, vide, "head");
     head.add_child(nose);
 
-    float p = 0.2;      // reduction size of lf
+    float p = 0.2;      // reduction size of lf, p increases => lf decreases
     float length = 5.25;        // total length
     float a = 2.75 / length * 100;          // length of lf / total length of the leg
     float b = 1.49 / length * 100;
@@ -176,7 +176,7 @@ Skeleton3D zebra_skeleton() {
     float b1 = b * q;
     float c1 = c * q;
     float t1 = b1 + c1;
-    float p1 = 0.15;
+    float p1 = 0.20;
     float q1 = (t1 - b1 + p1 * b1) / c1;    
 
     // front legs
