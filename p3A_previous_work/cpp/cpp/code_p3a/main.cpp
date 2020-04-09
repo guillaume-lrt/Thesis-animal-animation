@@ -165,7 +165,7 @@ double get_score(Skeleton3D ske, Mat image, bool show = false, string shape = "e
     //cout << ske.get_name() << " abs pos: " << ske.get_root()->getAbsPos() << endl;
     Mat c = t.toMat(image.rows, image.cols, show, shape);
     auto r = local_iou(image, c);
-    if (show) show_merged("recuit", image, c, to_string(r[0])); waitKey(10);
+    if (show) show_merged("recuit", image, c, to_string(r[0])); waitKey(50);
     //if (shape == "circle") return r[0] > 0.99 ? 1 : r[0];
     return r[0];
 }
@@ -350,184 +350,6 @@ double get_leg_angle(string leg, Skeleton3D hip) {
     }
     res = get_angle(child_pos);
     return res;
-}
-
-int get_direction(Skeleton3D* ske, Skeleton3D* bone, Mat image) {
-    //cout << "angle: " << get_angle(limb->get_root()->getPos()) << endl;
-    //cout << ske->get_child(0)->get_child(1)->get_child(0)->get_root()->getPos() << endl;
-
-    //cout << "debug 0.001: " << get_score(*bone, image, false, "circle") << endl;
-    if (get_score(*bone, image, false, "circle") == 1) {        // if it is already inside, go either way
-        return 1;
-    }
-
-    float angle = 5;
-    auto r = get_score(*bone, image, false);
-    //get_score(*ske, image, true);
-
-    set_vector_rotation(ske, bone, angle);
-    auto r1 = get_score(*bone, image, false);
-    //get_score(*ske, image, true);
-
-    set_vector_rotation(ske, bone, -2 * angle);
-    auto r2 = get_score(*bone, image, false);
-    //get_score(*ske, image, true);
-
-    set_vector_rotation(ske, bone, angle);
-    // go back to original position
-    // if r2 is a biggest score, should rotate counter clock-wise (i.e to the right as all vectors face down)
-    return r1 < r2 ? -1 : 1;          // so should mult by -1
-}
-
-double get_border(Skeleton3D* ske, Skeleton3D* bone, Mat im, int signe, double angle) {
-    // goal is to find the two angles s.t the extremity of the bone is on either sides of the leg (or any other limb)
-    // => take the average to get the middle of the leg
-    if (angle < 1) {
-        return get_angle(bone->get_root()->getPos()) * rtd;
-    }
-    //cout << endl << "name: " << bone->get_name() << endl;
-    //int signe = direction == "r" ? -1 : 1;              // if direction == r, angle is negative
-    auto is_inside = get_score(*bone, im, false, "circle") < 1 ? 0 : 1;      // if is_inside == 1 => extremity is inside the shape : else 0
-    //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
-    auto min_angles = bone->get_min_angle_constraints();
-    auto max_angles = bone->get_max_angle_constraints();
-    //cout << "max angle bis: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl;
-    auto temp = get_angle(bone->get_root()->getPos()) * double(rtd);
-    while (get_score(*bone, im, false, "circle") == is_inside && min_angles <= temp && temp <= max_angles) {
-        set_vector_rotation(ske, bone, signe * angle);
-        temp = get_angle(bone->get_root()->getPos()) * double(rtd);
-        //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
-    }
-    //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
-    //set_vector_rotation(ske, bone, -signe * angle);
-    if (get_score(*bone, im, false, "circle") == is_inside) {           // if it is still inside but reached to min/max angles
-        return get_border(ske, bone, im, -signe, angle / 2);                // go the other direction
-    }
-    return get_border(ske, bone, im, -signe, angle / 4);
-}
-
-void place_middle(Skeleton3D* ske, Skeleton3D* bone, Mat im) {
-    // place the extremity of the bone in the center of the leg (or other limb)
-    auto d = get_direction(ske, bone, im);
-    auto r = get_score(*bone, im, false, "circle");
-
-    //cout << "name, direction and score: " << bone->get_name() << ": " << d << ", " << r << endl;
-
-    auto first_angle = get_border(ske, bone, im, d, 5);
-    // auto n = log(10/2)/log(4);
-    //cout << "first angle: " << first_angle << endl;
-    if (r == 1) d *= -1;
-    set_vector_rotation(ske, bone, double(d) * 10);
-    auto second_angle = get_border(ske, bone, im, d, 5);
-    auto average = (second_angle + first_angle) / 2;
-    //cout << "name: " << bone->get_name() << endl;
-    //cout << "first angle: " << first_angle << endl;
-    //cout << "second angle: " << second_angle << endl;
-    //cout << "average: " << average << endl;
-    //cout << "max angle: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl << endl;
-    set_vector_rotation(ske, bone, average, "set angle");
-    //show_2D_image(*ske, im, true);
-
-    for (int i = 0; i < bone->get_children_size();i++) {
-        place_middle(ske, bone->get_child(i), im);
-    }
-}
-
-vector<double> get_intersection_circle_line(double x0, double y0, double r, Skeleton3D lower_bone, Skeleton3D upper_bone) {
-    // find x,y s.t 
-    // (x-x0)² + (y_y0)² = r² and
-    // y = a*x + b
-    auto coord_lower = lower_bone.get_root()->getAbsPos();
-    auto coord_upper = upper_bone.get_root()->getAbsPos();
-    /*coord_lower.y = -6.64;
-    coord_lower.x = -0.27;
-    coord_upper.y = -5;
-    coord_upper.x = 0;*/
-    auto a = (coord_lower.y - coord_upper.y) / (coord_lower.x - coord_upper.x);
-    auto b = coord_lower.y - a * coord_lower.x;
-    auto root = sqrt(max((a * a + 1) * r * r + b * (2 * y0 - 2 * a * x0) - pow(y0 - a * x0, 2) - b * b, double(0)));
-    auto xp = (-a * b + a * y0 + x0 + root) / (a * a + 1);
-    auto xm = (-a * b + a * y0 + x0 - root) / (a * a + 1);
-    auto yp = a * xp + b;
-    auto ym = a * xm + b;
-    auto dist_p = sqrt(pow(xp - coord_upper.x, 2) + pow(yp - coord_upper.y, 2));
-    auto dist_m = sqrt(pow(xm - coord_upper.x, 2) + pow(ym - coord_upper.y, 2));
-    vector<double> p = { xp,yp, coord_upper.z };
-    vector<double> m = { xm,ym, coord_upper.z };
-    return dist_p < dist_m ? p : m;     // return the closest one
-}
-
-void update_child(Skeleton3D* ske, Skeleton3D* bone, Skeleton3D child) {
-    // bone is the new position of the upper part of the leg (i.e "rf", "lf" etc)
-    // child is the child of bone before rotation
-    auto bone_pos = bone->get_root()->getAbsPos();
-    auto grand_child = child.get_child(0);
-    auto child_pos = child.get_root()->getPos();
-    double r = sqrt(pow(child_pos.x, 2) + pow(child_pos.y, 2));         // length of child
-    auto temp = get_intersection_circle_line(bone_pos.x, bone_pos.y, r, *grand_child, child);
-    Point3f child_new_abs_pos(temp[0], temp[1], temp[2]);
-    auto child_new_pos = child_new_abs_pos - bone_pos;
-    //cout << "DEBUG: " << sqrt(pow(child_new_pos.x, 2) + pow(child_new_pos.y, 2)) << endl;
-    auto angle = get_angle(child_new_pos) * double(rtd);            // convert in degree
-    set_vector_rotation(ske, bone->get_child(0), angle, "set angle");
-}
-
-void improve_legs(Skeleton3D* ske, Skeleton3D* bone, Mat im) {
-    // move the upper by looking at the score of its child
-    auto r = get_score(*bone->get_child(0), im, false, "ellipse");
-    double r_max = 0;
-    double angle = get_angle(bone->get_root()->getPos());
-    for (int i = 0; i < 10; i++) {
-        Skeleton3D child = *bone->get_child(0);
-
-        set_vector_rotation(ske, bone, pow(-1, i) * 2 * i);     //0, -3, 6 ...
-
-        update_child(ske, bone, child);
-
-        r = get_score(*bone->get_child(0), im, false, "ellipse");
-        if (r > r_max) {
-            r_max = r;
-            angle = get_angle(bone->get_root()->getPos());
-        }
-        //cout << "r: " << r_max << endl;
-        if (r_max >= 0.99) break;
-    }
-    //cout << "angle: " << angle * rtd << endl;
-    Skeleton3D child = *bone->get_child(0);
-    set_vector_rotation(ske, bone, angle * rtd, "set angle");
-    update_child(ske, bone, child);
-}
-
-void optimisation_middle(Skeleton3D* ske, Mat im) {
-    map<string, vector<int>> m = ske->get_children_map();
-    //cout << "start optimization midlle" << endl;
-    auto child = get_child("xrf", m, ske);
-    place_middle(ske, child, im);
-
-    child = get_child("xlf", m, ske);
-    place_middle(ske, child, im);
-
-    child = get_child("xlb", m, ske);
-    place_middle(ske, child, im);
-
-    child = get_child("xrb", m, ske);
-    place_middle(ske, child, im);
-
-    child = get_child("nose", m, ske);
-    place_middle(ske, child, im);
-
-    //show_2D_image(*ske, im, true);
-
-    improve_legs(ske, get_child("rf", m, ske), im);
-    improve_legs(ske, get_child("lf", m, ske), im);
-    improve_legs(ske, get_child("rb", m, ske), im);
-    improve_legs(ske, get_child("lb", m, ske), im);
-
-    /*Skeleton3D xxrf = *get_child("xxrf", m, ske);
-    Skeleton3D xxlf = *get_child("xxlf", m, ske);*/
-    //cout << "distance: " << distance_points(xxrf, xxlf) << endl;
-    //if (distance_points(xxrf, xxlf) < 20) { 
-    //}
 }
 
 Mat get_distance_transform(Mat src, bool show = true) {
@@ -720,20 +542,198 @@ void distance_opti(Skeleton3D* ske, Skeleton3D* bone, Mat dist_transf_im) {
 
 void optimisation_distance(Skeleton3D* ske, Mat im) {
     map<string, vector<int>> m = ske->get_children_map();
-    auto child = get_child("xrf", m, ske);
+    auto child = get_child("rf", m, ske);
     distance_opti(ske, child, im);
 
-    child = get_child("xlf", m, ske);
+    child = get_child("lf", m, ske);
     distance_opti(ske, child, im);
 
-    child = get_child("xlb", m, ske);
+    child = get_child("lb", m, ske);
     distance_opti(ske, child, im);
 
-    child = get_child("xrb", m, ske);
+    child = get_child("rb", m, ske);
     distance_opti(ske, child, im);
 
     child = get_child("head", m, ske);
     distance_opti(ske, child, im);
+}
+
+int get_direction(Skeleton3D* ske, Skeleton3D* bone, Mat image) {
+    //cout << "angle: " << get_angle(limb->get_root()->getPos()) << endl;
+    //cout << ske->get_child(0)->get_child(1)->get_child(0)->get_root()->getPos() << endl;
+
+    //cout << "debug 0.001: " << get_score(*bone, image, false, "circle") << endl;
+    if (get_score(*bone, image, false, "circle") == 1) {        // if it is already inside, go either way
+        return 1;
+    }
+
+    float angle = 5;
+    auto r = get_score(*bone, image, false);
+    //get_score(*ske, image, true);
+
+    set_vector_rotation(ske, bone, angle);
+    auto r1 = get_score(*bone, image, false);
+    //get_score(*ske, image, true);
+
+    set_vector_rotation(ske, bone, -2 * angle);
+    auto r2 = get_score(*bone, image, false);
+    //get_score(*ske, image, true);
+
+    set_vector_rotation(ske, bone, angle);
+    // go back to original position
+    // if r2 is a biggest score, should rotate counter clock-wise (i.e to the right as all vectors face down)
+    return r1 < r2 ? -1 : 1;          // so should mult by -1
+}
+
+double get_border(Skeleton3D* ske, Skeleton3D* bone, Mat im, int signe, double angle) {
+    // goal is to find the two angles s.t the extremity of the bone is on either sides of the leg (or any other limb)
+    // => take the average to get the middle of the leg
+    if (angle < 1) {
+        return get_angle(bone->get_root()->getPos()) * rtd;
+    }
+    //cout << endl << "name: " << bone->get_name() << endl;
+    //int signe = direction == "r" ? -1 : 1;              // if direction == r, angle is negative
+    auto is_inside = get_score(*bone, im, false, "circle") < 1 ? 0 : 1;      // if is_inside == 1 => extremity is inside the shape : else 0
+    //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
+    auto min_angles = bone->get_min_angle_constraints();
+    auto max_angles = bone->get_max_angle_constraints();
+    //cout << "max angle bis: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl;
+    auto temp = get_angle(bone->get_root()->getPos()) * double(rtd);
+    while (get_score(*bone, im, false, "circle") == is_inside && min_angles <= temp && temp <= max_angles) {
+        set_vector_rotation(ske, bone, signe * angle);
+        temp = get_angle(bone->get_root()->getPos()) * double(rtd);
+        //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
+    }
+    //cout << "score: " << get_score(*bone, im, false, "circle") << endl;
+    //set_vector_rotation(ske, bone, -signe * angle);
+    if (get_score(*bone, im, false, "circle") == is_inside) {           // if it is still inside but reached to min/max angles
+        return get_border(ske, bone, im, -signe, angle / 2);                // go the other direction
+    }
+    return get_border(ske, bone, im, -signe, angle / 4);
+}
+
+void place_middle(Skeleton3D* ske, Skeleton3D* bone, Mat im) {
+    // place the extremity of the bone in the center of the leg (or other limb)
+    auto d = get_direction(ske, bone, im);
+    auto r = get_score(*bone, im, false, "circle");
+
+    //cout << "name, direction and score: " << bone->get_name() << ": " << d << ", " << r << endl;
+
+    auto first_angle = get_border(ske, bone, im, d, 5);
+    // auto n = log(10/2)/log(4);
+    //cout << "first angle: " << first_angle << endl;
+    if (r == 1) d *= -1;
+    set_vector_rotation(ske, bone, double(d) * 10);
+    auto second_angle = get_border(ske, bone, im, d, 5);
+    auto average = (second_angle + first_angle) / 2;
+    //cout << "name: " << bone->get_name() << endl;
+    //cout << "first angle: " << first_angle << endl;
+    //cout << "second angle: " << second_angle << endl;
+    //cout << "average: " << average << endl;
+    //cout << "max angle: " << bone->get_max_angle_constraints() << ", " << bone->get_min_angle_constraints() << endl << endl;
+    set_vector_rotation(ske, bone, average, "set angle");
+    //show_2D_image(*ske, im, true);
+
+    for (int i = 0; i < bone->get_children_size();i++) {
+        place_middle(ske, bone->get_child(i), im);
+    }
+}
+
+vector<double> get_intersection_circle_line(double x0, double y0, double r, Skeleton3D lower_bone, Skeleton3D upper_bone) {
+    // find x,y s.t 
+    // (x-x0)² + (y_y0)² = r² and
+    // y = a*x + b
+    auto coord_lower = lower_bone.get_root()->getAbsPos();
+    auto coord_upper = upper_bone.get_root()->getAbsPos();
+    /*coord_lower.y = -6.64;
+    coord_lower.x = -0.27;
+    coord_upper.y = -5;
+    coord_upper.x = 0;*/
+    auto a = (coord_lower.y - coord_upper.y) / (coord_lower.x - coord_upper.x);
+    auto b = coord_lower.y - a * coord_lower.x;
+    auto root = sqrt(max((a * a + 1) * r * r + b * (2 * y0 - 2 * a * x0) - pow(y0 - a * x0, 2) - b * b, double(0)));
+    auto xp = (-a * b + a * y0 + x0 + root) / (a * a + 1);
+    auto xm = (-a * b + a * y0 + x0 - root) / (a * a + 1);
+    auto yp = a * xp + b;
+    auto ym = a * xm + b;
+    auto dist_p = sqrt(pow(xp - coord_upper.x, 2) + pow(yp - coord_upper.y, 2));
+    auto dist_m = sqrt(pow(xm - coord_upper.x, 2) + pow(ym - coord_upper.y, 2));
+    vector<double> p = { xp,yp, coord_upper.z };
+    vector<double> m = { xm,ym, coord_upper.z };
+    return dist_p < dist_m ? p : m;     // return the closest one
+}
+
+void update_child(Skeleton3D* ske, Skeleton3D* bone, Skeleton3D child) {
+    // bone is the new position of the upper part of the leg (i.e "rf", "lf" etc)
+    // child is the child of bone before rotation
+    auto bone_pos = bone->get_root()->getAbsPos();
+    auto grand_child = child.get_child(0);
+    auto child_pos = child.get_root()->getPos();
+    double r = sqrt(pow(child_pos.x, 2) + pow(child_pos.y, 2));         // length of child
+    auto temp = get_intersection_circle_line(bone_pos.x, bone_pos.y, r, *grand_child, child);
+    Point3f child_new_abs_pos(temp[0], temp[1], temp[2]);
+    auto child_new_pos = child_new_abs_pos - bone_pos;
+    //cout << "DEBUG: " << sqrt(pow(child_new_pos.x, 2) + pow(child_new_pos.y, 2)) << endl;
+    auto angle = get_angle(child_new_pos) * double(rtd);            // convert in degree
+    set_vector_rotation(ske, bone->get_child(0), angle, "set angle");
+}
+
+void improve_legs(Skeleton3D* ske, Skeleton3D* bone, Mat im) {
+    // move the upper by looking at the score of its child
+    auto r = get_score(*bone->get_child(0), im, false, "ellipse");
+    double r_max = 0;
+    double angle = get_angle(bone->get_root()->getPos());
+    for (int i = 0; i < 10; i++) {
+        Skeleton3D child = *bone->get_child(0);
+
+        set_vector_rotation(ske, bone, pow(-1, i) * 2 * i);     //0, -3, 6 ...
+
+        update_child(ske, bone, child);
+
+        r = get_score(*bone->get_child(0), im, false, "ellipse");
+        if (r > r_max) {
+            r_max = r;
+            angle = get_angle(bone->get_root()->getPos());
+        }
+        //cout << "r: " << r_max << endl;
+        if (r_max >= 0.99) break;
+    }
+    //cout << "angle: " << angle * rtd << endl;
+    Skeleton3D child = *bone->get_child(0);
+    set_vector_rotation(ske, bone, angle * rtd, "set angle");
+    update_child(ske, bone, child);
+}
+
+void optimisation_middle(Skeleton3D* ske, Mat im) {
+    map<string, vector<int>> m = ske->get_children_map();
+    //cout << "start optimization midlle" << endl;
+    auto child = get_child("xrf", m, ske);
+    place_middle(ske, child, im);
+
+    child = get_child("xlf", m, ske);
+    place_middle(ske, child, im);
+
+    child = get_child("xlb", m, ske);
+    place_middle(ske, child, im);
+
+    child = get_child("xrb", m, ske);
+    place_middle(ske, child, im);
+
+    child = get_child("nose", m, ske);
+    place_middle(ske, child, im);
+
+    //show_2D_image(*ske, im, true);
+
+    /*improve_legs(ske, get_child("rf", m, ske), im);
+    improve_legs(ske, get_child("lf", m, ske), im);
+    improve_legs(ske, get_child("rb", m, ske), im);
+    improve_legs(ske, get_child("lb", m, ske), im);*/
+
+    /*Skeleton3D xxrf = *get_child("xxrf", m, ske);
+    Skeleton3D xxlf = *get_child("xxlf", m, ske);*/
+    //cout << "distance: " << distance_points(xxrf, xxlf) << endl;
+    //if (distance_points(xxrf, xxlf) < 20) { 
+    //}
 }
 
 Mat load_image(int i_query, String file_path) {
@@ -849,7 +849,7 @@ Skeleton3D final_ske(int i_query, String file_path) {
         show_2D_image(hip, im, true);
         optimisation_distance(&hip, ima);
     }
-    //show_2D_image(hip, im, true);
+    show_2D_image(hip, im, true);
     auto hip_snd = hip;
     if (method == "middle") optimisation_middle(&hip_snd, im);
     else if (method == "none") return hip;
@@ -1193,8 +1193,6 @@ int main(int argc, const char * argv[]) {
 
     Skeleton3D hip = final_ske(0, file_path);
     Mat im = load_image(0, file_path);
-
-    //show_2D_image(hip, im, true);
     
     for (int i = 0; i < n; i++) {
         std::cout << "beginning" << endl;
@@ -1202,7 +1200,7 @@ int main(int argc, const char * argv[]) {
         skeletons.push_back(final_ske(i, file_path));
         std::cout << "end" << endl;
         auto pos = skeletons[i].get_root()->getPos();
-        //show_2D_image(skeletons[i], images[i], true);
+        show_2D_image(skeletons[i], images[i], true);
         skeletons[i].transform_translate(100-pos.x, 100-pos.y, 0);
         inverse_skeletons.push_back(skeletons.back());
         leg_changing(&inverse_skeletons.back());
@@ -1243,9 +1241,18 @@ int main(int argc, const char * argv[]) {
             if (j != i) {
                 //cout << i << ", " << j << endl;
                 string second_point = angles_keys[j];
-                //cout << first_point << ", " << second_point << endl;
-                auto temp = find_order(angles, angles_keys, first_point, second_point);
-                order_string[temp.begin()->first] = temp.begin()->second;
+                if (second_point[0] == '-') {
+                    if (second_point[1] != first_point[0]) {
+                        cout << first_point << ", " << second_point << endl;
+                        auto temp = find_order(angles, angles_keys, first_point, second_point);
+                        order_string[temp.begin()->first] = temp.begin()->second;
+                    }
+                }
+                else {
+                    cout << first_point << ", " << second_point << endl;
+                    auto temp = find_order(angles, angles_keys, first_point, second_point);
+                    order_string[temp.begin()->first] = temp.begin()->second;
+                }
             }
         }
     }
@@ -1272,10 +1279,9 @@ int main(int argc, const char * argv[]) {
     //vector<Skeleton3D> ske_interpo = make_animation(skeletons, order, 10);
     vector<Skeleton3D> ske_interpo = make_animation_v2(skeletons, inverse_skeletons, order, nb_images);
 
-    //show_animation(ske_interpo,images[0]);
+    show_animation(ske_interpo,images[0]);
    
-    //recuit_simule(im, v, hip);
-
+    /*
     std::ofstream outfile(export_path + "animation.txt");
     auto m = ske_interpo[0].get_children_map();
 
@@ -1322,6 +1328,7 @@ int main(int argc, const char * argv[]) {
     }
     outfile1 << "]]";
     outfile1.close();
+    */
 
     std::cout << "Key: " << key << endl;
 
